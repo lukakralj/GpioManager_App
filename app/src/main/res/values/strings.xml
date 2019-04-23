@@ -6,4 +6,8 @@
     <string name="emptyUsernameMsg">Please enter a username first.</string>
     <string name="emptyPasswordMsg">Please enter a password first.</string>
     <string name="invalidCredentialsMsg">Invalid credentials.</string>
+    <string name="toggleLED">Toggle LED</string>
+    <string name="ledOn">LED was turned on.</string>
+    <string name="ledOff">LED was turned off.</string>
+    <string name="toggleLEDfailed">Could not toggle LED.</string>
 </resources>

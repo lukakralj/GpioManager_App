@@ -27,6 +27,7 @@ public class LoginScreen extends AppCompatActivity {
 
         final Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 handleLoginButton(v);
             }
