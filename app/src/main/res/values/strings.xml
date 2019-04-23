@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Smart Home App</string>
+    <string name="usernameHint">Username</string>
+    <string name="passwordHint">Password</string>
+    <string name="loginButton">Login</string>
+    <string name="emptyUsernameMsg">Please enter a username first.</string>
+    <string name="emptyPasswordMsg">Please enter a password first.</string>
+    <string name="invalidCredentialsMsg">Invalid credentials.</string>
 </resources>

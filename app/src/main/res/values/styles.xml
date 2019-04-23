@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="LoginText" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColorHint">@color/colorLoginText</item>
+        <item name="android:textColor">@color/colourNormalText</item>
+    </style>
 </resources>
