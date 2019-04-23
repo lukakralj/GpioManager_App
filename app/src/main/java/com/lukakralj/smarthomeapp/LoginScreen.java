@@ -8,8 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
+/**
+ * This is the entry point of the application. It requires the user to login
+ * with predefined username and password.
+ */
 public class LoginScreen extends AppCompatActivity {
 
     private EditText usernameInput;
@@ -34,11 +36,19 @@ public class LoginScreen extends AppCompatActivity {
         });
     }
 
+    /**
+     * Disable back button.
+     */
     @Override
     public void onBackPressed() {
         // do nothing...
     }
 
+    /**
+     * Decide what happens when a Login button is clicked.
+     *
+     * @param v
+     */
     private void handleLoginButton(View v) {
         String msg;
         if (usernameInput.getText().toString().trim().equals("")) {
@@ -65,11 +75,22 @@ public class LoginScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method verifies user. It send a login request.
+     * TODO: this method should take care of storing access tokens and user info locally
+     *
+     * @param username Username the user entered.
+     * @param password Password the user entered.
+     * @return True if this user can login, false otherwise.
+     */
     private boolean verifyUser(String username, String password) {
         // TODO: put in separate class and add actual verification
         return username.equals("admin") && password.equals("admin");
     }
 
+    /**
+     * This method opens a new activity upon successful login.
+     */
     private void loginUser() {
         Intent intent = new Intent(this, HomeScreen.class);
         startActivity(intent);
