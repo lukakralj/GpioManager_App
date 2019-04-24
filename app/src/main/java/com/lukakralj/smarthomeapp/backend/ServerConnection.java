@@ -12,10 +12,11 @@ import io.socket.client.Socket;
 public class ServerConnection {
 
     private Socket io;
+    public static String url = "http://2ab92dee.ngrok.io";
 
     public ServerConnection() {
         try {
-            io = IO.socket("http://10.171.17.204:3265");
+            io = IO.socket(url);
             io.connect();
             System.out.println("======IO connected:" + io.connected());
         } catch (URISyntaxException e) {
@@ -25,6 +26,9 @@ public class ServerConnection {
     }
 
     public Socket getSocket() {
+        if (!io.connected()) {
+            return null;
+        }
         return io;
     }
 }

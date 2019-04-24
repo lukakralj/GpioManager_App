@@ -2,6 +2,9 @@ package com.lukakralj.smarthomeapp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import com.lukakralj.smarthomeapp.backend.ServerConnection;
@@ -18,6 +21,7 @@ public class HomeScreen extends AppCompatActivity {
 
     private TextView toggleLEDMsg;
     private RadioGroup toggle;
+    private EditText newUrlInput;
 
     private ServerConnection connection;
 
@@ -28,11 +32,20 @@ public class HomeScreen extends AppCompatActivity {
 
         toggleLEDMsg = (TextView) findViewById(R.id.toggleLEDMsg);
         toggle = (RadioGroup) findViewById(R.id.toggle);
+        newUrlInput = (EditText) findViewById(R.id.newUrlInput);
 
         toggle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 handleToggle(group, checkedId);
+            }
+        });
+
+        final Button reconnectBtn = (Button) findViewById(R.id.reconnectButton);
+        reconnectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reconnect();
             }
         });
 
@@ -84,7 +97,9 @@ public class HomeScreen extends AppCompatActivity {
     private boolean toggleLED(boolean turnOn) {
 
         Socket io = connection.getSocket();
-
+        if (io == null) {
+            toggleLEDMsg.setText("Couldn't connect.");
+        }
         io.emit("msg", (turnOn) ? "Android: LED ON" : "Android: LED OFF");
         System.out.println("======= emitted");
         io.once("res", resReceived);
@@ -102,4 +117,17 @@ public class HomeScreen extends AppCompatActivity {
             toggleLEDMsg.setText(res);
         }
     };
+
+    private void reconnect() {
+        String newUrl = newUrlInput.getText().toString();
+        if (newUrl.trim().length() == 0) {
+            toggleLEDMsg.setText("Empty url");
+            return;
+        }
+
+        ServerConnection.url = newUrl;
+
+        finish();
+        startActivity(getIntent());
+    }
 }
