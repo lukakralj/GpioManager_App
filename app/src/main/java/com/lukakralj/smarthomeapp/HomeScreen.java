@@ -1,5 +1,6 @@
 package com.lukakralj.smarthomeapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.lukakralj.smarthomeapp.backend.Crypto;
 import com.lukakralj.smarthomeapp.backend.ServerConnection;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -99,11 +102,18 @@ public class HomeScreen extends AppCompatActivity {
         Socket io = connection.getSocket();
         if (io == null) {
             toggleLEDMsg.setText("Couldn't connect.");
+            return false;
         }
-        io.emit("msg", (turnOn) ? "Android: LED ON" : "Android: LED OFF");
-        System.out.println("======= emitted");
+        String toSend = (turnOn) ? "Android: LED ON" : "Android: LED OFF";
+        try {
+            toSend = Crypto.getInstance().encrypt(toSend, ServerConnection.serverKey);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        io.emit("msg", toSend);
         io.once("res", resReceived);
-        System.out.println("======= once");
+
         // TODO: add request sending
         return true;
     }
@@ -113,7 +123,15 @@ public class HomeScreen extends AppCompatActivity {
         @Override
         public void call(Object... args) {
             System.out.println("======= resReceived called:" + args);
-            String res = ((String) args[0]) + (++count);
+            System.out.println("Encoded: " + args[0]);
+            String decoded = null;
+            try {
+                decoded = Crypto.getInstance().decrypt((String) args[0]);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            String res = decoded + (++count);
             toggleLEDMsg.setText(res);
         }
     };
@@ -121,13 +139,16 @@ public class HomeScreen extends AppCompatActivity {
     private void reconnect() {
         String newUrl = newUrlInput.getText().toString();
         if (newUrl.trim().length() == 0) {
-            toggleLEDMsg.setText("Empty url");
-            return;
+            //toggleLEDMsg.setText("Empty url");
+            //return;
+            newUrl = ServerConnection.url;
         }
 
         ServerConnection.url = newUrl;
 
-        finish();
-        startActivity(getIntent());
+        if (connection.getSocket() != null) {
+            connection.getSocket().disconnect();
+        }
+        connection = new ServerConnection();
     }
 }

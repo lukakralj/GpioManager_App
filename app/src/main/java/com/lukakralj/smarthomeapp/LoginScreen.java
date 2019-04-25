@@ -50,8 +50,8 @@ public class LoginScreen extends AppCompatActivity {
      * @param v
      */
     private void handleLoginButton(View v) {
-        String msg;
-        if (usernameInput.getText().toString().trim().equals("")) {
+        String msg = null;
+        /*if (usernameInput.getText().toString().trim().equals("")) {
             msg = getString(R.string.emptyUsernameMsg);
         }
         else if (passwordInput.getText().toString().trim().equals("")) {
@@ -65,7 +65,7 @@ public class LoginScreen extends AppCompatActivity {
             else {
                 msg = null;
             }
-        }
+        }*/
         if (msg == null) {
             loginMessage.setText("");
             loginUser();
