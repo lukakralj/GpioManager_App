@@ -1,53 +1,214 @@
 package com.lukakralj.smarthomeapp.backend;
 
-import android.app.Application;
-import com.lukakralj.smarthomeapp.R;
+import com.lukakralj.smarthomeapp.backend.logger.Level;
+import com.lukakralj.smarthomeapp.backend.logger.Logger;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
+import android.os.Process;
+import static com.lukakralj.smarthomeapp.backend.RequestCode.*;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This class enables communication with the main server.
  */
-public class ServerConnection {
+public class ServerConnection extends Thread {
+    private static String url = "http://9fa8f89c.ngrok.io";
+    private static ServerConnection instance;
+    private static List<ServerEvent> events = new ArrayList<>();
+    private static int currentEvent = -1;
 
     private Socket io;
-    public static String url = "http://9fa8f89c.ngrok.io";
-    public static String serverKey;
+    private boolean stop;
 
-    public ServerConnection() {
+    private ServerConnection() {
         try {
-            System.out.println("Connecting to: " + url);
+            Logger.log("Connecting to: " + url);
             io = IO.socket(url);
-
             io.connect();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-
-        io.emit("key", Crypto.getInstance().getPublicKey());
-        io.once("keyRes", resReceived);
+        stop = false;
     }
 
-    private Emitter.Listener resReceived = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            System.out.println("======= resReceived called in connect:" + args);
-            System.out.println("==== res type: " + args[0].getClass());
-            String res = (String) args[0];
-
-            //res = res.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
-
-            serverKey = res;
-            System.out.println("server key:" + serverKey);
+    /**
+     *
+     * @return Instance of ServerConnection.
+     */
+    public static ServerConnection getInstance() {
+        if (instance == null) {
+            try {
+                instance = new ServerConnection();
+            }
+            catch (Exception e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+                throw new RuntimeException(e.getCause());
+            }
         }
-    };
+        return instance;
+    }
 
-    public Socket getSocket() {
-        if (!io.connected()) {
-            return null;
+    /**
+     * Reconnect to the server using a new URL. Previously scheduled events will be preserved.
+     *
+     * @param newUrl New url of the server.
+     */
+    public static void reconnect(String newUrl) {
+        instance.stopThread();
+        try {
+            instance.join();
         }
-        return io;
+        catch (InterruptedException e) {
+            Logger.log(e.getMessage(), Level.ERROR);
+        }
+        instance = null;
+        url = newUrl;
+        getInstance().start();
+    }
+
+    /**
+     * Start executing the events.
+     */
+    public void run() {
+        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        scheduleRequest(SERVER_KEY, false, data -> {
+            try {
+                Crypto.getInstance().setServerPublicKey(data.getString("serverKey"));
+            }
+            catch (JSONException e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+            }
+        });
+        while (!stop) {
+            try {
+                synchronized (this) {
+                    wait(1);
+                }
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (currentEvent != events.size() - 1) { // check if there are any new events
+                currentEvent++;
+                processEvent(events.get(currentEvent));
+            }
+        }
+    }
+
+    /**
+     * Executes the request specified by the event and threats the response.
+     *
+     * @param event Event to be executed.
+     */
+    private void processEvent(ServerEvent event) {
+        String code = getCodeString(event.requestCode);
+        if (event.extraData != null) {
+            String encoded = Crypto.getInstance().encrypt(event.extraData);
+            if (encoded == null) {
+                Logger.log("Couldn't encode the message: " + event.extraData.toString());
+                return;
+            }
+            io.emit(code, encoded);
+        }
+        else {
+            io.emit(code);
+        }
+
+        io.once(code + "Res", args -> {
+            try {
+                JSONObject data;
+                if (event.expectEncryptedResponse) {
+                    data = Crypto.getInstance().decrypt((String) args[0]);
+                    if (data == null) {
+                        Logger.log("Couldn't decode the message for: " + code + "Res");
+                        return;
+                    }
+                }
+                else {
+                    data = new JSONObject((String) args[0]);
+                }
+                event.listener.processResponse(data);
+            }
+            catch (Exception e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+            }
+        });
+    }
+
+    /**
+     * Stop thread.
+     */
+    public void stopThread() {
+        stop = true;
+    }
+
+    /**
+     * Schedule new request to be sent to the server. Requests are processed in
+     * first-come-first-server manner.
+     *
+     * @param requestCode Request specific code.
+     * @param listener Specifies what happens when the response is received.
+     * @param extraData Specify additional information to be sent to the server. null if no
+     *                  additional information needed.
+     * @param expectEncryptedResponse True if the expected response is encrypted or not.
+     *                                Usually, this should be true, unless for initial key exchange.
+     */
+    public void scheduleRequest(RequestCode requestCode, JSONObject extraData, boolean expectEncryptedResponse, ResponseListener listener) {
+        events.add(new ServerEvent(requestCode, extraData, expectEncryptedResponse, listener));
+    }
+
+    /**
+     * Schedule new request to be sent to the server. Requests are processed in
+     * first-come-first-server manner.
+     *
+     * @param requestCode Request specific code.
+     * @param listener Specifies what happens when the response is received.
+     * @param expectEncryptedResponse True if the expected response is encrypted or not.
+     *                                Usually, this should be true, unless for initial key exchange.
+     */
+    public void scheduleRequest(RequestCode requestCode, boolean expectEncryptedResponse, ResponseListener listener) {
+        events.add(new ServerEvent(requestCode, null, expectEncryptedResponse, listener));
+    }
+
+    /**
+     * Combines the details about each request to be send to the server.
+     */
+    private class ServerEvent {
+
+        private RequestCode requestCode;
+        private ResponseListener listener;
+        private JSONObject extraData;
+        private boolean expectEncryptedResponse;
+
+        /**
+         *
+         * @param requestCode Request specific code.
+         * @param listener Specifies what happens when the response is received.
+         */
+        private ServerEvent(RequestCode requestCode, JSONObject extraData, boolean expectEncryptedResponse, ResponseListener listener) {
+            this.requestCode = requestCode;
+            this.extraData = extraData;
+            this.expectEncryptedResponse = expectEncryptedResponse;
+            this.listener = listener;
+        }
+    }
+
+    /**
+     *
+     * @param code Request code.
+     * @return String associated with the request code.
+     */
+    private String getCodeString(RequestCode code) {
+        switch (code) {
+            case SERVER_KEY: return "serverKey";
+            case LOGIN: return "login";
+            case MSG: return "msg";
+            default: throw new RuntimeException("Invalid server code: " + code);
+        }
     }
 }
