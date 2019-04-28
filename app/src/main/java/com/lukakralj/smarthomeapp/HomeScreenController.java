@@ -1,6 +1,5 @@
 package com.lukakralj.smarthomeapp;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +7,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-
 import com.lukakralj.smarthomeapp.backend.Crypto;
 import com.lukakralj.smarthomeapp.backend.ServerConnection;
 import io.socket.client.Socket;
@@ -20,7 +18,7 @@ import io.socket.emitter.Emitter;
  * For now this screen only provides a simple toggle. This will be updated once the
  * whole structure is tested.
  */
-public class HomeScreen extends AppCompatActivity {
+public class HomeScreenController extends AppCompatActivity {
 
     private TextView toggleLEDMsg;
     private RadioGroup toggle;

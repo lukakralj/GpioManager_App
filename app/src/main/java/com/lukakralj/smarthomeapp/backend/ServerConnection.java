@@ -9,7 +9,6 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import android.os.Process;
 import static com.lukakralj.smarthomeapp.backend.RequestCode.*;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +20,7 @@ public class ServerConnection extends Thread {
     private static ServerConnection instance;
     private static List<ServerEvent> events = new ArrayList<>();
     private static int currentEvent = -1;
+    private static String accessToken;
 
     private Socket io;
     private boolean stop;
@@ -107,17 +107,34 @@ public class ServerConnection extends Thread {
      */
     private void processEvent(ServerEvent event) {
         String code = getCodeString(event.requestCode);
-        if (event.extraData != null) {
+
+        // include accessToken to every request that needs it
+        // only serverKey and login don't need the token
+        if (event.requestCode != SERVER_KEY && event.requestCode != LOGIN) {
+            if (event.extraData == null) {
+                event.extraData = new JSONObject();
+            }
+            try {
+                event.extraData.put("accessToken", accessToken);
+            }
+            catch (JSONException e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+                Logger.log("Event not processed due to exception.", Level.ERROR);
+                return;
+            }
+        }
+
+        String toSend = null;
+        if (event.requestCode != SERVER_KEY) {
             String encoded = Crypto.getInstance().encrypt(event.extraData);
             if (encoded == null) {
                 Logger.log("Couldn't encode the message: " + event.extraData.toString());
                 return;
             }
-            io.emit(code, encoded);
-        }
-        else {
-            io.emit(code);
-        }
+            toSend = encoded;
+        }// else we don't have a key so we cannot encrypt
+
+        io.emit(code, toSend);
 
         io.once(code + "Res", args -> {
             try {
@@ -131,6 +148,9 @@ public class ServerConnection extends Thread {
                 }
                 else {
                     data = new JSONObject((String) args[0]);
+                }
+                if (event.requestCode == LOGIN && data.getString("status").equals("OK")) {
+                    accessToken = data.getString("accessToken");
                 }
                 event.listener.processResponse(data);
             }

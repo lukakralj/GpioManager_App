@@ -10,4 +10,5 @@
     <string name="ledOn">LED was turned on.</string>
     <string name="ledOff">LED was turned off.</string>
     <string name="toggleLEDfailed">Could not toggle LED.</string>
+    <string name="configure">Configure URL</string>
 </resources>
