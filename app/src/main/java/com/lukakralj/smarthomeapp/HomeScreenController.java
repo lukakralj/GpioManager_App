@@ -1,16 +1,20 @@
 package com.lukakralj.smarthomeapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import com.lukakralj.smarthomeapp.backend.Crypto;
+import com.lukakralj.smarthomeapp.backend.RequestCode;
 import com.lukakralj.smarthomeapp.backend.ServerConnection;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
+import com.lukakralj.smarthomeapp.backend.logger.Level;
+import com.lukakralj.smarthomeapp.backend.logger.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 /**
  * This will be the main screen of the app once the user is logged in.
@@ -22,9 +26,6 @@ public class HomeScreenController extends AppCompatActivity {
 
     private TextView toggleLEDMsg;
     private RadioGroup toggle;
-    private EditText newUrlInput;
-
-    private ServerConnection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,25 +34,38 @@ public class HomeScreenController extends AppCompatActivity {
 
         toggleLEDMsg = (TextView) findViewById(R.id.toggleLEDMsg);
         toggle = (RadioGroup) findViewById(R.id.toggle);
-        newUrlInput = (EditText) findViewById(R.id.newUrlInput);
 
-        toggle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                handleToggle(group, checkedId);
-            }
-        });
+        toggle.setOnCheckedChangeListener(this::handleToggle);
 
-        final Button reconnectBtn = (Button) findViewById(R.id.reconnectButton);
-        reconnectBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reconnect();
-            }
-        });
-
-        connection = new ServerConnection();
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.homeToolbar);
+        setSupportActionBar(myToolbar);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.home_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.configureURLhome) {
+            // open url config activity
+            showDialog();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    void showDialog() {
+        Intent intent = new Intent(this, ConfigureURLController.class);
+        startActivity(intent);
+    }
+
 
     /**
      * Disable back button.
@@ -70,22 +84,10 @@ public class HomeScreenController extends AppCompatActivity {
     private void handleToggle(RadioGroup group, int checkedId) {
         String msg = null;
         if (checkedId == R.id.toggleOn) {
-            if (toggleLED(true)) {
-                //msg = getString(R.string.ledOn);
-            }
+            toggleLED(true);
         }
         else {
-            if (toggleLED(false)) {
-                //msg = getString(R.string.ledOff);
-            }
-        }
-
-        if (msg == null) {
-            //toggleLEDMsg.setText(getString(R.string.toggleLEDfailed));
-        }
-        else {
-            System.out.println("======= text set");
-            toggleLEDMsg.setText(msg);
+            toggleLED(false);
         }
     }
 
@@ -93,60 +95,32 @@ public class HomeScreenController extends AppCompatActivity {
      * Send a request to physically toggle the LED.
      *
      * @param turnOn True if turning the LED on, false otherwise.
-     * @return True if an LED was successfully turned on. False otherwise.
      */
-    private boolean toggleLED(boolean turnOn) {
-
-        Socket io = connection.getSocket();
-        if (io == null) {
-            toggleLEDMsg.setText("Couldn't connect.");
-            return false;
-        }
+    private void toggleLED(boolean turnOn) {
         String toSend = (turnOn) ? "Android: LED ON" : "Android: LED OFF";
+        JSONObject json = new JSONObject();
         try {
-            toSend = Crypto.getInstance().encrypt(toSend, ServerConnection.serverKey);
+            json.put("text", toSend);
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (JSONException e) {
+            Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
+            return;
         }
-        io.emit("msg", toSend);
-        io.once("res", resReceived);
+        ServerConnection.getInstance().scheduleRequest(RequestCode.MSG, json, true, data -> {
+            try {
+                if (data.getString("status").equals("OK")) {
+                    String msg = data.getString("msg") + "\n" + System.currentTimeMillis();
+                    toggleLEDMsg.setText(msg);
+                }
+            }
+            catch (JSONException e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
+            }
+        });
 
         // TODO: add request sending
-        return true;
     }
 
-    private int count = 0;
-    private Emitter.Listener resReceived = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            System.out.println("======= resReceived called:" + args);
-            System.out.println("Encoded: " + args[0]);
-            String decoded = null;
-            try {
-                decoded = Crypto.getInstance().decrypt((String) args[0]);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            String res = decoded + (++count);
-            toggleLEDMsg.setText(res);
-        }
-    };
-
-    private void reconnect() {
-        String newUrl = newUrlInput.getText().toString();
-        if (newUrl.trim().length() == 0) {
-            //toggleLEDMsg.setText("Empty url");
-            //return;
-            newUrl = ServerConnection.url;
-        }
-
-        ServerConnection.url = newUrl;
-
-        if (connection.getSocket() != null) {
-            connection.getSocket().disconnect();
-        }
-        connection = new ServerConnection();
-    }
 }

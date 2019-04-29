@@ -42,6 +42,8 @@ public class Crypto {
             }
             catch (Exception e) {
                 Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
+e.printStackTrace();
                 throw new RuntimeException(e.getCause());
             }
         }
@@ -72,6 +74,7 @@ public class Crypto {
      * @param newKey Base64 encoded string.
      */
     public void setServerPublicKey(String newKey) {
+        Logger.log("server key: " + newKey);
         try {
             byte[] keyDecoded = Base64.decode(newKey, Base64.DEFAULT);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyDecoded);
@@ -79,8 +82,9 @@ public class Crypto {
             serverKey = factory.generatePublic(keySpec);
         }
         catch (Exception e) {
-            Logger.log(e.toString(), Level.ERROR);
+            Logger.log(e.getMessage(), Level.ERROR);
             serverKey = null;
+            e.printStackTrace();
         }
     }
 
@@ -99,7 +103,8 @@ public class Crypto {
             return Base64.encodeToString(encrypted, Base64.DEFAULT);
         }
         catch (Exception e) {
-            Logger.log(e.toString(), Level.ERROR);
+            Logger.log(e.getMessage(), Level.ERROR);
+            e.printStackTrace();
             return null;
         }
     }
@@ -119,7 +124,8 @@ public class Crypto {
             return new JSONObject(str);
         }
         catch (Exception e) {
-            Logger.log(e.toString(), Level.ERROR);
+            Logger.log(e.getMessage(), Level.ERROR);
+            e.printStackTrace();
             return null;
         }
     }

@@ -4,8 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeScreen"
+    tools:context=".HomeScreenController"
     android:background="@color/colorBackgroundLogin">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/homeToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/AppTheme"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        tools:layout_editor_absoluteX="-39dp">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            style="@style/ToolbarTitleStyle"
+            tools:layout_editor_absoluteX="152dp"
+            tools:layout_editor_absoluteY="18dp" />
+
+    </android.support.v7.widget.Toolbar>
 
     <RadioGroup
         android:id="@+id/toggle"
@@ -35,7 +54,7 @@
             android:background="@drawable/toggle_widget_background"
             android:button="@null"
             android:gravity="center"
-            android:text="ON"
+            android:text="@string/ON"
             android:textColor="@color/white" />
 
         <RadioButton
@@ -49,7 +68,7 @@
             android:background="@drawable/toggle_widget_background"
             android:button="@null"
             android:gravity="center"
-            android:text="OFF"
+            android:text="@string/OFF"
             android:textColor="@color/white"
             android:textSize="20sp" />
     </RadioGroup>
@@ -90,35 +109,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.706" />
 
-    <EditText
-        android:id="@+id/newUrlInput"
-        style="@style/LoginText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="8dp"
-        android:ems="10"
-        android:hint="new url"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toggleLEDMsg" />
-
-    <Button
-        android:id="@+id/reconnectButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="Reconnect"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newUrlInput"
-        app:layout_constraintVertical_bias="0.094" />
 </android.support.constraint.ConstraintLayout>

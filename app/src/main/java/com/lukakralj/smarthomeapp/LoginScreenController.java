@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
-
 import com.lukakralj.smarthomeapp.backend.Crypto;
 import com.lukakralj.smarthomeapp.backend.RequestCode;
 import com.lukakralj.smarthomeapp.backend.ServerConnection;
@@ -32,6 +31,10 @@ public class LoginScreenController extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.startLogger();
+        ServerConnection.getInstance();
+        Crypto.getInstance();
+
         setContentView(R.layout.activity_login_screen);
 
         usernameInput = (EditText) findViewById(R.id.usernameInput);
@@ -57,13 +60,20 @@ public class LoginScreenController extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.configureURL) {
+        if (id == R.id.configureURLlogin) {
             // open url config activity
+            showDialog();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    void showDialog() {
+        Intent intent = new Intent(this, ConfigureURLController.class);
+        startActivity(intent);
+    }
+
 
     /**
      * Disable back button.
@@ -116,6 +126,7 @@ public class LoginScreenController extends AppCompatActivity {
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
             invalidCredentials();
             return;
         }
@@ -130,6 +141,7 @@ public class LoginScreenController extends AppCompatActivity {
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
             }
         });
     }

@@ -3,6 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/configureURLlogin"
+        android:id="@+id/configureURLhome"
         android:title="@string/configure" />
 </menu>

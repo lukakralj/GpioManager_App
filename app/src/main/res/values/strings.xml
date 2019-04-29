@@ -11,4 +11,9 @@
     <string name="ledOff">LED was turned off.</string>
     <string name="toggleLEDfailed">Could not toggle LED.</string>
     <string name="configure">Configure URL</string>
+    <string name="newURLHint">Enter new URL</string>
+    <string name="cancel">Cancel</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="ON">ON</string>
+    <string name="OFF">OFF</string>
 </resources>

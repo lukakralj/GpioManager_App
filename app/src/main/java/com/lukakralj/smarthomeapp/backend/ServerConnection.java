@@ -8,6 +8,8 @@ import java.util.List;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import android.os.Process;
+import android.util.Log;
+
 import static com.lukakralj.smarthomeapp.backend.RequestCode.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +18,7 @@ import org.json.JSONObject;
  * This class enables communication with the main server.
  */
 public class ServerConnection extends Thread {
-    private static String url = "http://9fa8f89c.ngrok.io";
+    private static String url = "http://04478faf.ngrok.io";
     private static ServerConnection instance;
     private static List<ServerEvent> events = new ArrayList<>();
     private static int currentEvent = -1;
@@ -44,9 +46,11 @@ public class ServerConnection extends Thread {
         if (instance == null) {
             try {
                 instance = new ServerConnection();
+                instance.start();
             }
             catch (Exception e) {
                 Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
                 throw new RuntimeException(e.getCause());
             }
         }
@@ -65,10 +69,11 @@ public class ServerConnection extends Thread {
         }
         catch (InterruptedException e) {
             Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
         }
         instance = null;
         url = newUrl;
-        getInstance().start();
+        getInstance();
     }
 
     /**
@@ -76,18 +81,22 @@ public class ServerConnection extends Thread {
      */
     public void run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        Logger.log("Run started", Level.DEBUG);
         scheduleRequest(SERVER_KEY, false, data -> {
+            Logger.log("Data:" + data.toString(), Level.DEBUG);
             try {
                 Crypto.getInstance().setServerPublicKey(data.getString("serverKey"));
+                Logger.log("Received server key: {" + data.getString("serverKey") + "}", Level.DEBUG);
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
             }
         });
         while (!stop) {
             try {
                 synchronized (this) {
-                    wait(1);
+                    wait(2);
                 }
             }
             catch (InterruptedException e) {
@@ -95,6 +104,7 @@ public class ServerConnection extends Thread {
             }
             if (currentEvent != events.size() - 1) { // check if there are any new events
                 currentEvent++;
+                Logger.log("Processing event: " + events.get(currentEvent).requestCode);
                 processEvent(events.get(currentEvent));
             }
         }
@@ -119,6 +129,7 @@ public class ServerConnection extends Thread {
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
                 Logger.log("Event not processed due to exception.", Level.ERROR);
                 return;
             }
@@ -147,7 +158,7 @@ public class ServerConnection extends Thread {
                     }
                 }
                 else {
-                    data = new JSONObject((String) args[0]);
+                    data = (JSONObject)args[0];
                 }
                 if (event.requestCode == LOGIN && data.getString("status").equals("OK")) {
                     accessToken = data.getString("accessToken");
@@ -156,6 +167,7 @@ public class ServerConnection extends Thread {
             }
             catch (Exception e) {
                 Logger.log(e.getMessage(), Level.ERROR);
+e.printStackTrace();
             }
         });
     }
@@ -167,6 +179,9 @@ public class ServerConnection extends Thread {
         stop = true;
     }
 
+    public String getCurrentUrl() {
+        return url;
+    }
     /**
      * Schedule new request to be sent to the server. Requests are processed in
      * first-come-first-server manner.
