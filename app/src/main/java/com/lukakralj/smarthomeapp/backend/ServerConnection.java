@@ -8,7 +8,6 @@ import java.util.List;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import android.os.Process;
-import android.util.Log;
 
 import static com.lukakralj.smarthomeapp.backend.RequestCode.*;
 import org.json.JSONException;
@@ -137,13 +136,13 @@ e.printStackTrace();
 
         String toSend = null;
         if (event.requestCode != SERVER_KEY) {
-            String encoded = Crypto.getInstance().encrypt(event.extraData);
+            String encoded = Crypto.getInstance().rsaEncrypt(event.extraData);
             if (encoded == null) {
                 Logger.log("Couldn't encode the message: " + event.extraData.toString());
                 return;
             }
             toSend = encoded;
-        }// else we don't have a key so we cannot encrypt
+        }// else we don't have a key so we cannot rsaEncrypt
 
         io.emit(code, toSend);
 
@@ -151,7 +150,7 @@ e.printStackTrace();
             try {
                 JSONObject data;
                 if (event.expectEncryptedResponse) {
-                    data = Crypto.getInstance().decrypt((String) args[0]);
+                    data = Crypto.getInstance().rsaDecrypt((String) args[0]);
                     if (data == null) {
                         Logger.log("Couldn't decode the message for: " + code + "Res");
                         return;
