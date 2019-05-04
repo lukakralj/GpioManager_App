@@ -132,6 +132,7 @@ e.printStackTrace();
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.LOGIN, extraData, true, data -> {
             try {
+                Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
                     startHomeActivity();
                 }

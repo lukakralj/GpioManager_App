@@ -81,7 +81,8 @@ e.printStackTrace();
     public void run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
         Logger.log("Run started", Level.DEBUG);
-        scheduleRequest(SERVER_KEY, false, data -> {
+        // TODO: uncomment if using encryption
+        /*scheduleRequest(SERVER_KEY, false, data -> {
             Logger.log("Data:" + data.toString(), Level.DEBUG);
             try {
                 Crypto.getInstance().setServerPublicKey(data.getString("serverKey"));
@@ -91,7 +92,7 @@ e.printStackTrace();
                 Logger.log(e.getMessage(), Level.ERROR);
 e.printStackTrace();
             }
-        });
+        });*/
         while (!stop) {
             try {
                 synchronized (this) {
@@ -134,7 +135,8 @@ e.printStackTrace();
             }
         }
 
-        String toSend = null;
+        // TODO: uncommendt if using encryption
+        /*String toSend = null;
         if (event.requestCode != SERVER_KEY) {
             String encoded = Crypto.getInstance().rsaEncrypt(event.extraData);
             if (encoded == null) {
@@ -143,22 +145,23 @@ e.printStackTrace();
             }
             toSend = encoded;
         }// else we don't have a key so we cannot rsaEncrypt
-
-        io.emit(code, toSend);
+        */
+        io.emit(code, event.extraData);
 
         io.once(code + "Res", args -> {
             try {
                 JSONObject data;
-                if (event.expectEncryptedResponse) {
+                // TODO: uncomment if using encryption
+                /*if (event.expectEncryptedResponse) {
                     data = Crypto.getInstance().rsaDecrypt((String) args[0]);
                     if (data == null) {
                         Logger.log("Couldn't decode the message for: " + code + "Res");
                         return;
                     }
                 }
-                else {
+                else {*/
                     data = (JSONObject)args[0];
-                }
+                //}
                 if (event.requestCode == LOGIN && data.getString("status").equals("OK")) {
                     accessToken = data.getString("accessToken");
                 }

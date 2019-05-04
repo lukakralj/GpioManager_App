@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".LoginScreenController"
     android:background="@color/colorBackgroundLogin">
 
@@ -13,16 +14,10 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        android:theme="@style/AppTheme"
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         tools:layout_editor_absoluteX="-39dp">
-
-        <TextView
-            android:id="@+id/toolbar_title"
-            style="@style/ToolbarTitleStyle"
-            tools:layout_editor_absoluteX="152dp"
-            tools:layout_editor_absoluteY="18dp" />
 
     </android.support.v7.widget.Toolbar>
 
