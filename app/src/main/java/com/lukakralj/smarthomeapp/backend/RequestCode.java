@@ -3,5 +3,6 @@ package com.lukakralj.smarthomeapp.backend;
 public enum RequestCode {
     SERVER_KEY,
     LOGIN,
-    MSG
+    LED_STATUS,
+    TOGGLE_LED
 }

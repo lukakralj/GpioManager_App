@@ -16,4 +16,5 @@
     <string name="reconnect">Reconnect</string>
     <string name="ON">ON</string>
     <string name="OFF">OFF</string>
+    <string name="waitingServer">Waiting for server&#8230;</string>
 </resources>

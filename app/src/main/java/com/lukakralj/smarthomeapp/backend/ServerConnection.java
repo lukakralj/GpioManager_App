@@ -244,7 +244,8 @@ e.printStackTrace();
         switch (code) {
             case SERVER_KEY: return "serverKey";
             case LOGIN: return "login";
-            case MSG: return "msg";
+            case LED_STATUS: return "ledStatus";
+            case TOGGLE_LED: return "toggleLed";
             default: throw new RuntimeException("Invalid server code: " + code);
         }
     }

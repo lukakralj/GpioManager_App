@@ -2,6 +2,8 @@ package com.lukakralj.smarthomeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -137,7 +139,8 @@ e.printStackTrace();
                     startHomeActivity();
                 }
                 else {
-                    invalidCredentials();
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(this::invalidCredentials);
                 }
             }
             catch (JSONException e) {

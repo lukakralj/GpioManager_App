@@ -1,11 +1,14 @@
 package com.lukakralj.smarthomeapp;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import com.lukakralj.smarthomeapp.backend.RequestCode;
@@ -25,6 +28,8 @@ import org.json.JSONObject;
 public class HomeScreenController extends AppCompatActivity {
 
     private TextView toggleLEDMsg;
+    private RadioButton toggleOn;
+    private RadioButton toggleOff;
     private RadioGroup toggle;
 
     @Override
@@ -33,12 +38,33 @@ public class HomeScreenController extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
 
         toggleLEDMsg = (TextView) findViewById(R.id.toggleLEDMsg);
+        toggleOn = (RadioButton) findViewById(R.id.toggleOn);
+        toggleOff = (RadioButton) findViewById(R.id.toggleOff);
         toggle = (RadioGroup) findViewById(R.id.toggle);
 
         toggle.setOnCheckedChangeListener(this::handleToggle);
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.homeToolbar);
         setSupportActionBar(myToolbar);
+
+        disableButtons();
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LED_STATUS,true, data -> {
+            boolean isOn = false;
+            try {
+                String msg = "LED is turned ";
+                msg += data.getString("ledStatus") + ".";
+                toggleLEDMsg.setText(msg);
+
+                isOn = data.getString("ledStatus").equals("on");
+            }
+            catch (JSONException e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+                e.printStackTrace();
+            }
+            Handler handler = new Handler(Looper.getMainLooper());
+            final boolean isOnFinal = isOn;
+            handler.post(() -> enableButtons(isOnFinal));
+        });
     }
 
     @Override
@@ -82,7 +108,7 @@ public class HomeScreenController extends AppCompatActivity {
      * @param checkedId Resource ID of the radio button that is currently selected.
      */
     private void handleToggle(RadioGroup group, int checkedId) {
-        String msg = null;
+        disableButtons();
         if (checkedId == R.id.toggleOn) {
             toggleLED(true);
         }
@@ -97,30 +123,67 @@ public class HomeScreenController extends AppCompatActivity {
      * @param turnOn True if turning the LED on, false otherwise.
      */
     private void toggleLED(boolean turnOn) {
-        String toSend = (turnOn) ? "Android: LED ON" : "Android: LED OFF";
-        JSONObject json = new JSONObject();
+        String toSend = (turnOn) ? "on" : "off";
+        JSONObject extra = new JSONObject();
         try {
-            json.put("text", toSend);
+            extra.put("ledStatus", toSend);
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
 e.printStackTrace();
             return;
         }
-        ServerConnection.getInstance().scheduleRequest(RequestCode.MSG, json, true, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.TOGGLE_LED, extra, true, data -> {
+            boolean isOn = false;
             try {
                 if (data.getString("status").equals("OK")) {
-                    String msg = data.getString("msg") + "\n" + System.currentTimeMillis();
+                    String msg = "success: LED is turned ";
+                    msg += data.getString("ledstatus") + ".";
                     toggleLEDMsg.setText(msg);
+
+                    isOn = data.getString("ledStatus").equals("on");
+                }
+                else {
+                    Logger.log("Could not toggle LED.", Level.ERROR);
+                    Logger.log(data.toString(), Level.DEBUG);
+                    String msg = "error: " + data.getString("err_code") + ". LED is turned ";
+                    msg += data.getString("ledStatus") + ".";
+                    toggleLEDMsg.setText(msg);
+                    isOn = data.getString("ledStatus").equals("on");
                 }
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
 e.printStackTrace();
             }
+            Handler handler = new Handler(Looper.getMainLooper());
+            final boolean isOnFinal = isOn;
+            handler.post(() -> enableButtons(isOnFinal));
         });
+    }
 
-        // TODO: add request sending
+    private void disableButtons() {
+        toggleLEDMsg.setText(R.string.waitingServer);
+        toggleOn.setEnabled(false);
+        toggleOff.setEnabled(false);
+    }
+
+    /**
+     * Enables buttons and sets the selected button.
+     *
+     * @param isOn True if LED is on. False if LED is off.
+     */
+    private void enableButtons(boolean isOn) {
+        toggleOn.setEnabled(true);
+        toggleOff.setEnabled(true);
+        toggle.setOnCheckedChangeListener(null);
+        if (isOn) {
+            toggle.check(R.id.toggleOn);
+        }
+        else {
+            toggle.check(R.id.toggleOff);
+        }
+        toggle.setOnCheckedChangeListener(this::handleToggle);
     }
 
 }
