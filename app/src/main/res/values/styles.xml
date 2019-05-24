@@ -7,6 +7,11 @@
         <item name="android:textColor">@color/colourNormalText</item>
     </style>
 
+    <style name="SubtitleText" parent="LoginText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/colorSubtitles</item>
+    </style>
+
     <style name="ToolbarTitleStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
