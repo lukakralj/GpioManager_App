@@ -20,4 +20,5 @@
     <string name="noComponents">No components are currently registered.</string>
     <string name="componentsTitle">Components</string>
     <string name="componentsButton">Components</string>
+    <string name="waitingConnection">Waiting for connection&#8230;</string>
 </resources>

@@ -28,11 +28,14 @@ public class LoginScreenController extends AppCompatActivity {
 
     private EditText usernameInput;
     private EditText passwordInput;
+    private Button loginButton;
     private TextView loginMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // TODO: where to put this?
         Logger.startLogger();
         ServerConnection.getInstance();
         Crypto.getInstance();
@@ -44,11 +47,30 @@ public class LoginScreenController extends AppCompatActivity {
         loginMessage = (TextView) findViewById(R.id.loginMessage);
         resetAll();
 
-        final Button loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(this::handleLoginButton);
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.loginToolbar);
         setSupportActionBar(myToolbar);
+
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), (data) -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::enableAll);
+            loginMessage.setText("");
+            Logger.log("login onConnect listener called", Level.DEBUG);
+        });
+
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), (data) -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::disableAll);
+            loginMessage.setText(R.string.waitingConnection);
+            Logger.log("login onDisconnect listener called", Level.DEBUG);
+        });
+
+        if (!ServerConnection.getInstance().isConnected()) {
+            disableAll();
+            loginMessage.setText(R.string.waitingConnection);
+        }
     }
 
     @Override
@@ -157,6 +179,18 @@ e.printStackTrace();
         usernameInput.setText("");
         passwordInput.setText("");
         loginMessage.setText("");
+    }
+
+    private void enableAll() {
+        usernameInput.setEnabled(true);
+        passwordInput.setEnabled(true);
+        loginButton.setEnabled(true);
+    }
+
+    private void disableAll() {
+        usernameInput.setEnabled(false);
+        passwordInput.setEnabled(false);
+        loginButton.setEnabled(false);
     }
 
     /**

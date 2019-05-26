@@ -5,6 +5,7 @@ import com.lukakralj.smarthomeapp.backend.logger.Logger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +26,12 @@ public class ServerConnection extends Thread {
     private static List<ServerEvent> events = new ArrayList<>();
     private static int currentEvent = -1;
     private static String accessToken;
+    private static Map<Class, OnConnectListener> onConnectListeners = new HashMap<>();
+    private static Map<Class, OnDisconnectListener> onDisconnectListeners = new HashMap<>();
 
     private Socket io;
     private boolean stop;
     private boolean connected;
-    private Map<Class, OnConnectListener> onConnectListeners;
-    private Map<Class, OnDisconnectListener> onDisconnectListeners;
 
     private ServerConnection() {
         try {
@@ -39,16 +40,12 @@ public class ServerConnection extends Thread {
 
             io.on(Socket.EVENT_CONNECT, (data) -> {
                 connected = true;
-                for (OnConnectListener l : onConnectListeners.values()) {
-                    l.connected(data);
-                }
+                triggerOnConnectListeners(data);
             });
 
             io.on(Socket.EVENT_DISCONNECT, (data) -> {
                 connected = false;
-                for (OnDisconnectListener l : onDisconnectListeners.values()) {
-                    l.disconnected(data);
-                }
+                triggerOnDisconnectListeners(data);
             });
 
             io.connect();
@@ -239,11 +236,25 @@ e.printStackTrace();
     }
 
     public void subscribeOnConnectEvent(Class subscriber, OnConnectListener listener) {
+        Logger.log("subscribed", Level.DEBUG);
         onConnectListeners.put(subscriber, listener);
+        Logger.log("size: " + onConnectListeners.size(), Level.DEBUG);
     }
 
     public void subscribeOnDisconnectEvent(Class subscriber, OnDisconnectListener listener) {
         onDisconnectListeners.put(subscriber, listener);
+    }
+
+    private void triggerOnConnectListeners(Object data) {
+        for (OnConnectListener l : onConnectListeners.values()) {
+            l.connected(data);
+        }
+    }
+
+    private void triggerOnDisconnectListeners(Object data) {
+        for (OnDisconnectListener l : onDisconnectListeners.values()) {
+            l.disconnected(data);
+        }
     }
 
     public boolean isConnected() {
