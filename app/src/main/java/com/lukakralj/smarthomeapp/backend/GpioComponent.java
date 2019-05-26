@@ -10,14 +10,14 @@ public class GpioComponent {
     private boolean isOn;
     private int curValue;
 
-    public GpioComponent(int id, int physicalPin, String direction, String name, String description, boolean isOn, int curValue) {
+    public GpioComponent(int id, int physicalPin, String direction, String name, String description) {
         this.id = id;
         this.physicalPin = physicalPin;
         this.direction = direction;
         this.name = name;
         this.description = description;
-        this.isOn = isOn;
-        this.curValue = curValue;
+        this.isOn = false;
+        this.curValue = -1;
     }
 
     public int getId() {
@@ -46,5 +46,13 @@ public class GpioComponent {
 
     public void setIsOn(boolean isOn) {
         this.isOn = isOn;
+    }
+
+    public int getCurValue() {
+        return curValue;
+    }
+
+    public void setCurValue(int curValue) {
+        this.curValue = curValue;
     }
 }

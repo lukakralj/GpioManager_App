@@ -17,4 +17,7 @@
     <string name="ON">ON</string>
     <string name="OFF">OFF</string>
     <string name="waitingServer">Waiting for server&#8230;</string>
+    <string name="noComponents">No components are currently registered.</string>
+    <string name="componentsTitle">Components</string>
+    <string name="componentsButton">Components</string>
 </resources>
