@@ -189,8 +189,26 @@ public class ComponentsScreen extends ListActivity {
                     toggle.check(toggleOff.getId());
                 }
                 toggle.setOnCheckedChangeListener((radioGroup, checkedId) -> {
-                    data.get(position).setIsOn(!data.get(position).getIsOn());
-                    notifyDataSetChanged();
+                    JSONObject extra;
+                    try {
+                        extra = new JSONObject();
+                        extra.put("id", data.get(position).getId());
+                        extra.put("status", (data.get(position).getIsOn()) ? "off" : "on");
+                    }
+                    catch (JSONException e) {
+                        Logger.log(e.getCause().toString(), Level.ERROR);
+                        extra = null;
+                    }
+                    ServerConnection.getInstance().scheduleRequest(RequestCode.TOGGLE_COMPONENT, extra, true, (serverData) -> {
+                        try {
+                            if (serverData.getString("status").equals("OK")) {
+                                Logger.log("Toggle successful for component id: " + data.get(position).getId() + ".");
+                            }
+                        }
+                        catch (JSONException e) {
+                            Logger.log(e.getCause().toString(), Level.ERROR);
+                        }
+                    });
                 });
 
                 if (itemsEnabled) {
@@ -214,68 +232,4 @@ public class ComponentsScreen extends ListActivity {
             return vi;
         }
     }
-
-    /*
-    TODO: FOR REFERENCE ONLY
-
-        ServerConnection.getInstance().scheduleRequest(RequestCode.LED_STATUS,true, data -> {
-            boolean isOn = false;
-            try {
-                String msg = "LED is turned ";
-                msg += data.getString("ledStatus") + ".";
-                toggleLEDMsg.setText(msg);
-
-                isOn = data.getString("ledStatus").equals("on");
-            }
-            catch (JSONException e) {
-                Logger.log(e.getMessage(), Level.ERROR);
-                e.printStackTrace();
-            }
-            Handler handler = new Handler(Looper.getMainLooper());
-            final boolean isOnFinal = isOn;
-            handler.post(() -> enableButtons(isOnFinal));
-        });
-
-    private void toggleLED(boolean turnOn) {
-        String toSend = (turnOn) ? "on" : "off";
-        JSONObject extra = new JSONObject();
-        try {
-            extra.put("ledStatus", toSend);
-        }
-        catch (JSONException e) {
-            Logger.log(e.getMessage(), Level.ERROR);
-            e.printStackTrace();
-            return;
-        }
-        ServerConnection.getInstance().scheduleRequest(RequestCode.TOGGLE_LED, extra, true, data -> {
-            boolean isOn = false;
-            try {
-                if (data.getString("status").equals("OK")) {
-                    String msg = "success: LED is turned ";
-                    msg += data.getString("ledstatus") + ".";
-                    toggleLEDMsg.setText(msg);
-
-                    isOn = data.getString("ledStatus").equals("on");
-                }
-                else {
-                    Logger.log("Could not toggle LED.", Level.ERROR);
-                    Logger.log(data.toString(), Level.DEBUG);
-                    String msg = "error: " + data.getString("err_code") + ". LED is turned ";
-                    msg += data.getString("ledStatus") + ".";
-                    toggleLEDMsg.setText(msg);
-                    isOn = data.getString("ledStatus").equals("on");
-                }
-            }
-            catch (JSONException e) {
-                Logger.log(e.getMessage(), Level.ERROR);
-                e.printStackTrace();
-            }
-            Handler handler = new Handler(Looper.getMainLooper());
-            final boolean isOnFinal = isOn;
-            handler.post(() -> enableButtons(isOnFinal));
-        });
-    }
-
-     */
-
 }
