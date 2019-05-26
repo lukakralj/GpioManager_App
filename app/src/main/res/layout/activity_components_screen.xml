@@ -20,6 +20,24 @@
 
     </android.support.v7.widget.Toolbar>
 
+
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="330dp"
+        android:layout_height="557dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu"
+        app:layout_constraintVertical_bias="0.245">
+
+    </ListView>
+
     <!-- Displayed if list is empty. -->
     <TextView
         android:id="@android:id/empty"
@@ -36,54 +54,5 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu" />
-
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="330dp"
-        android:layout_height="557dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/menu"
-        app:layout_constraintVertical_bias="0.245">
-
-        <!--<RelativeLayout
-            android:id="@+id/mainPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <include android:id="@+id/a1"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="10dp"
-                layout="@layout/component_toggle" />
-
-            <include android:id="@+id/a2"
-                android:layout_below="@id/a1"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="10dp"
-                layout="@layout/component_toggle" />
-
-            <include android:id="@+id/a3"
-                android:layout_below="@id/a2"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="10dp"
-                layout="@layout/component_toggle" />
-
-            <include android:id="@+id/a4"
-                android:layout_below="@id/a3"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="10dp"
-                layout="@layout/component_toggle" />
-        </RelativeLayout>-->
-    </ListView>
-
 
 </android.support.constraint.ConstraintLayout>

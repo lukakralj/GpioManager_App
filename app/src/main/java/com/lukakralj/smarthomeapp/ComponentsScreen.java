@@ -39,6 +39,7 @@ public class ComponentsScreen extends ListActivity {
 
         // assign the list adapter
         setListAdapter(myAdapter);
+
     }
 
     // when an item of the list is clicked
@@ -49,7 +50,7 @@ public class ComponentsScreen extends ListActivity {
         String selectedItem = (String) getListView().getItemAtPosition(position);
         //String selectedItem = (String) getListAdapter().getItem(position);
 
-        Logger.log("You clicked " + selectedItem + " at position " + position, Level.DEBUG);
+        Logger.log("You clicked " + selectedItem + " at position " + position + ", id: " + id, Level.DEBUG);
     }
 
     private int dpToPx(int dp) {
