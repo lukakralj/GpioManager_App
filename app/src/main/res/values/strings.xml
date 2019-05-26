@@ -23,4 +23,5 @@
     <string name="waitingConnection">Waiting for connection&#8230;</string>
     <string name="retrievingData">Retrieving data&#8230;</string>
     <string name="sthWentWrong">Something went wrong :/</string>
+    <string name="upToDate">Up to date.</string>
 </resources>

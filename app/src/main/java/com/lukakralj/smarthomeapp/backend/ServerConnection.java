@@ -4,7 +4,6 @@ import com.lukakralj.smarthomeapp.backend.logger.Level;
 import com.lukakralj.smarthomeapp.backend.logger.Logger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +11,8 @@ import java.util.Map;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Looper;
 import android.os.Process;
 
-import static android.content.Context.MODE_PRIVATE;
 import static com.lukakralj.smarthomeapp.backend.RequestCode.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +26,9 @@ public class ServerConnection extends Thread {
     private static List<ServerEvent> events = new ArrayList<>();
     private static int currentEvent = -1;
     private static String accessToken;
-    private static Map<Class, OnConnectListener> onConnectListeners = new HashMap<>();
-    private static Map<Class, OnDisconnectListener> onDisconnectListeners = new HashMap<>();
+    private static Map<Class, SubscriberEvent> onConnectEvents = new HashMap<>();
+    private static Map<Class, SubscriberEvent> onDisconnectEvents = new HashMap<>();
+    private static Map<Class, SubscriberEvent> onComponentsChangeEvents = new HashMap<>();
 
     private Socket io;
     private boolean stop;
@@ -45,12 +41,16 @@ public class ServerConnection extends Thread {
 
             io.on(Socket.EVENT_CONNECT, (data) -> {
                 connected = true;
-                triggerOnConnectListeners(data);
+                triggerSubscriberEvents(onConnectEvents);
             });
 
             io.on(Socket.EVENT_DISCONNECT, (data) -> {
                 connected = false;
-                triggerOnDisconnectListeners(data);
+                triggerSubscriberEvents(onDisconnectEvents);
+            });
+
+            io.on(getCodeString(COMPONENTS_CHANGE), (data) -> {
+                triggerSubscriberEvents(onComponentsChangeEvents);
             });
 
             io.connect();
@@ -241,25 +241,21 @@ e.printStackTrace();
         return scheduleRequest(requestCode, null, expectEncryptedResponse, listener);
     }
 
-    public void subscribeOnConnectEvent(Class subscriber, OnConnectListener listener) {
-        Logger.log("subscribed", Level.DEBUG);
-        onConnectListeners.put(subscriber, listener);
-        Logger.log("size: " + onConnectListeners.size(), Level.DEBUG);
+    public void subscribeOnConnectEvent(Class subscriber, SubscriberEvent event) {
+        onConnectEvents.put(subscriber, event);
     }
 
-    public void subscribeOnDisconnectEvent(Class subscriber, OnDisconnectListener listener) {
-        onDisconnectListeners.put(subscriber, listener);
+    public void subscribeOnDisconnectEvent(Class subscriber, SubscriberEvent event) {
+        onDisconnectEvents.put(subscriber, event);
     }
 
-    private void triggerOnConnectListeners(Object data) {
-        for (OnConnectListener l : onConnectListeners.values()) {
-            l.connected(data);
-        }
+    public void subscribeComponentsChangeEvent(Class subscriber, SubscriberEvent event) {
+        onComponentsChangeEvents.put(subscriber, event);
     }
 
-    private void triggerOnDisconnectListeners(Object data) {
-        for (OnDisconnectListener l : onDisconnectListeners.values()) {
-            l.disconnected(data);
+    private void triggerSubscriberEvents(Map<Class, SubscriberEvent> events) {
+        for (SubscriberEvent l : events.values()) {
+            l.triggerEvent();
         }
     }
 

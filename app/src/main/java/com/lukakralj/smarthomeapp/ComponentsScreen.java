@@ -32,6 +32,7 @@ public class ComponentsScreen extends ListActivity {
     private ComponentsAdapter curAdapter;
     private boolean itemsEnabled;
     private TextView componentsMsg;
+    private boolean joinedRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +45,18 @@ public class ComponentsScreen extends ListActivity {
 
         componentsMsg = (TextView) findViewById(R.id.componentsMsg);
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), (data) -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
             retrieveData();
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), (data) -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
+
+        ServerConnection.getInstance().subscribeComponentsChangeEvent(this.getClass(), this::retrieveData);
 
         if (!ServerConnection.getInstance().isConnected()) {
             disableAll();
@@ -68,21 +71,6 @@ public class ComponentsScreen extends ListActivity {
         super.onListItemClick(list, vi, position, id);
     }
 
-    public void addComponent(GpioComponent component) {
-        components.add(component);
-        curAdapter.notifyDataSetChanged();
-    }
-
-    public void removeComponent(int componentId) {
-        for (int i = 0; i < components.size(); ++i) {
-            if (components.get(i).getId() == componentId) {
-                components.remove(i);
-                break;
-            }
-        }
-        curAdapter.notifyDataSetChanged();
-    }
-
     private void disableAll() {
         componentsMsg.setText(R.string.waitingConnection);
         itemsEnabled = false;
@@ -90,15 +78,21 @@ public class ComponentsScreen extends ListActivity {
     }
 
     private void enableAll() {
-        componentsMsg.setText("");
         itemsEnabled = true;
-        curAdapter.notifyDataSetChanged();
+        retrieveData();
     }
 
     private void retrieveData() {
         componentsMsg.setText(R.string.retrievingData);
+        if (!joinedRoom) {
+            ServerConnection.getInstance().scheduleRequest(RequestCode.JOIN_COMPONENTS_ROOM, false, data -> {
+                Logger.log("Joined components room.");
+                joinedRoom = true;
+            });
+        }
+
         ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, true, data -> {
-            int msgId = -1;
+            int msgId;
             try {
                 if (data.getString("status").equals("OK")) {
                     JSONArray comps = data.getJSONArray("components");
@@ -107,6 +101,7 @@ public class ComponentsScreen extends ListActivity {
                         Logger.log(comps.getJSONObject(i).toString(), Level.DEBUG);
                         components.add(new GpioComponent(comps.getJSONObject(i)));
                     }
+                    msgId = R.string.upToDate;
                 }
                 else {
                     msgId = R.string.sthWentWrong;
@@ -120,15 +115,20 @@ public class ComponentsScreen extends ListActivity {
             Handler handler = new Handler(Looper.getMainLooper());
             final int id = msgId;
             handler.post(() -> {
-                if (id == -1) {
-                    componentsMsg.setText("");
-                    curAdapter.notifyDataSetChanged();
-                }
-                else {
-                    componentsMsg.setText(id);
-                }
+                curAdapter.notifyDataSetChanged();
+                componentsMsg.setText(id);
             });
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, false, data -> {
+            Logger.log("Left components room.");
+        });
+        joinedRoom = false;
+
+        super.onBackPressed();
     }
 
     private class ComponentsAdapter extends BaseAdapter {

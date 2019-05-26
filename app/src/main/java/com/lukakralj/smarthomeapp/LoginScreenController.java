@@ -54,14 +54,14 @@ public class LoginScreenController extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.loginToolbar);
         setSupportActionBar(myToolbar);
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), (data) -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
             loginMessage.setText("");
             Logger.log("login onConnect listener called", Level.DEBUG);
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), (data) -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
             loginMessage.setText(R.string.waitingConnection);
