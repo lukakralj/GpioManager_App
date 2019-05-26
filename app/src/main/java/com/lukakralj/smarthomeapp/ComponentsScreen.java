@@ -1,18 +1,26 @@
 package com.lukakralj.smarthomeapp;
 
+import android.app.ListActivity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+
+import com.lukakralj.smarthomeapp.backend.logger.Level;
+import com.lukakralj.smarthomeapp.backend.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ComponentsScreen extends AppCompatActivity {
+public class ComponentsScreen extends ListActivity {
 
     private RelativeLayout mainPanel;
 
@@ -21,40 +29,27 @@ public class ComponentsScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_components_screen);
 
-        initMainPanel(new ArrayList<>());
+        List<String> testing = new ArrayList<>();
+        testing.add("one");
+        testing.add("two");
+        testing.add("three");
+        //initMainPanel(testing);
+        // initiate the listadapter
+        ArrayAdapter<String> myAdapter = new ArrayAdapter<String>(this, R.layout.component_toggle, R.id.mainTitle, testing);
+
+        // assign the list adapter
+        setListAdapter(myAdapter);
     }
 
-    private void initMainPanel(List<String> contents) { // TODO: to be changed to JSON
-        mainPanel = new RelativeLayout(this);
-        RelativeLayout.LayoutParams mainParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-        mainPanel.setLayoutParams(mainParams);
+    // when an item of the list is clicked
+    @Override
+    protected void onListItemClick(ListView list, View view, int position, long id) {
+        super.onListItemClick(list, view, position, id);
 
-        int curId = 1;
-        for (int i = 0; i < contents.size(); i++) {
-            RelativeLayout component = (RelativeLayout) View.inflate(this, R.layout.component_toggle, mainPanel);
-            component.setId(curId);
+        String selectedItem = (String) getListView().getItemAtPosition(position);
+        //String selectedItem = (String) getListAdapter().getItem(position);
 
-            RelativeLayout.LayoutParams compParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-            compParams.setMargins(0,0,0, dpToPx(10));
-
-            if (curId > 1) {
-                // add align_below
-                compParams.addRule(RelativeLayout.BELOW, curId-1);
-            }
-
-            component.setLayoutParams(compParams);
-            mainPanel.addView(component);
-            curId++;
-        }
-
-        // add main to the scroll view
-        ((ScrollView) findViewById(R.id.componentsScroll)).addView(mainPanel);
+        Logger.log("You clicked " + selectedItem + " at position " + position, Level.DEBUG);
     }
 
     private int dpToPx(int dp) {

@@ -91,7 +91,7 @@ public class LoginScreenController extends AppCompatActivity {
      * @param v
      */
     private void handleLoginButton(View v) {
-        String username = usernameInput.getText().toString().trim();
+        /*String username = usernameInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
         if (username.equals("")) {
@@ -102,7 +102,10 @@ public class LoginScreenController extends AppCompatActivity {
         }
         else {
             verifyUser(username, password);
-        }
+        }*/
+
+        Intent intent = new Intent(this, ComponentsScreen.class);
+        startActivity(intent);
     }
 
     /**

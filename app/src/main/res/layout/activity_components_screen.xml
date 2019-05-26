@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeScreenController"
+    tools:context=".ComponentsScreen"
     android:background="@color/colorBackgroundLogin">
 
     <android.support.v7.widget.Toolbar
@@ -20,20 +20,38 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <ScrollView
-        android:id="@+id/componentsScroll"
-        android:layout_width="389dp"
-        android:layout_height="659dp"
+    <!-- Displayed if list is empty. -->
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="168dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="There is no data"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@android:id/list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu" />
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="330dp"
+        android:layout_height="557dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintVertical_bias="0.245">
 
-        <RelativeLayout
+        <!--<RelativeLayout
             android:id="@+id/mainPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -64,8 +82,8 @@
                 android:layout_width="wrap_content"
                 android:layout_marginBottom="10dp"
                 layout="@layout/component_toggle" />
-        </RelativeLayout>
-    </ScrollView>
+        </RelativeLayout>-->
+    </ListView>
 
 
 </android.support.constraint.ConstraintLayout>
