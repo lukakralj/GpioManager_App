@@ -157,6 +157,14 @@ public class ComponentsScreen extends ListActivity {
                 }
             }
 
+            // needed for correct rendering
+            if (ServerConnection.getInstance().isConnected()) {
+                vi.setEnabled(true);
+            }
+            else {
+                vi.setEnabled(false);
+            }
+
             return vi;
         }
     }
