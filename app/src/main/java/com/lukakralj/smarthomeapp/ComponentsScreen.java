@@ -14,9 +14,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import com.lukakralj.smarthomeapp.backend.GpioComponent;
+import com.lukakralj.smarthomeapp.backend.RequestCode;
 import com.lukakralj.smarthomeapp.backend.ServerConnection;
 import com.lukakralj.smarthomeapp.backend.logger.Level;
 import com.lukakralj.smarthomeapp.backend.logger.Logger;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,7 @@ public class ComponentsScreen extends ListActivity {
     private static List<GpioComponent> components = new ArrayList<>();
     private ComponentsAdapter curAdapter;
     private boolean itemsEnabled;
+    private TextView componentsMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,16 +39,15 @@ public class ComponentsScreen extends ListActivity {
         setContentView(R.layout.activity_components_screen);
         itemsEnabled = true;
 
-        components.add(new GpioComponent(0, 27, "out", "LED 1", "Description 1"));
-        components.add(new GpioComponent(0, 28, "out", "LED 2", "Description 2"));
-        components.add(new GpioComponent(0, 29, "out", "LED 3", "Description 3"));
-
         curAdapter = new ComponentsAdapter(this, components);
         setListAdapter(curAdapter);
+
+        componentsMsg = (TextView) findViewById(R.id.componentsMsg);
 
         ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), (data) -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
+            retrieveData();
         });
 
         ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), (data) -> {
@@ -52,6 +57,9 @@ public class ComponentsScreen extends ListActivity {
 
         if (!ServerConnection.getInstance().isConnected()) {
             disableAll();
+        }
+        else {
+            retrieveData();
         }
     }
 
@@ -76,13 +84,51 @@ public class ComponentsScreen extends ListActivity {
     }
 
     private void disableAll() {
+        componentsMsg.setText(R.string.waitingConnection);
         itemsEnabled = false;
         curAdapter.notifyDataSetChanged();
     }
 
     private void enableAll() {
+        componentsMsg.setText("");
         itemsEnabled = true;
         curAdapter.notifyDataSetChanged();
+    }
+
+    private void retrieveData() {
+        componentsMsg.setText(R.string.retrievingData);
+        ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, true, data -> {
+            int msgId = -1;
+            try {
+                if (data.getString("status").equals("OK")) {
+                    JSONArray comps = data.getJSONArray("components");
+                    components.clear();
+                    for (int i = 0; i < comps.length(); ++i) {
+                        Logger.log(comps.getJSONObject(i).toString(), Level.DEBUG);
+                        components.add(new GpioComponent(comps.getJSONObject(i)));
+                    }
+                }
+                else {
+                    msgId = R.string.sthWentWrong;
+                }
+            }
+            catch (JSONException e) {
+                Logger.log(e.getLocalizedMessage(), Level.ERROR);
+                e.printStackTrace();
+                msgId = R.string.sthWentWrong;
+            }
+            Handler handler = new Handler(Looper.getMainLooper());
+            final int id = msgId;
+            handler.post(() -> {
+                if (id == -1) {
+                    componentsMsg.setText("");
+                    curAdapter.notifyDataSetChanged();
+                }
+                else {
+                    componentsMsg.setText(id);
+                }
+            });
+        });
     }
 
     private class ComponentsAdapter extends BaseAdapter {

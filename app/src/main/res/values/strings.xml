@@ -21,4 +21,6 @@
     <string name="componentsTitle">Components</string>
     <string name="componentsButton">Components</string>
     <string name="waitingConnection">Waiting for connection&#8230;</string>
+    <string name="retrievingData">Retrieving data&#8230;</string>
+    <string name="sthWentWrong">Something went wrong :/</string>
 </resources>
