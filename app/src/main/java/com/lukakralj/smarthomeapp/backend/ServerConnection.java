@@ -292,8 +292,14 @@ e.printStackTrace();
         switch (code) {
             case SERVER_KEY: return "serverKey";
             case LOGIN: return "login";
-            case LED_STATUS: return "ledStatus";
-            case TOGGLE_LED: return "toggleLed";
+            case JOIN_COMPONENTS_ROOM: return "joinComponentsRoom";
+            case LEAVE_COMPONENTS_ROOM: return "leaveComponentsRoom";
+            case COMPONENTS: return "components";
+            case TOGGLE_COMPONENT: return "toggleComponent";
+            case UPDATE_COMPONENT: return "updateComponent";
+            case ADD_COMPONENT: return "addComponent";
+            case REMOVE_COMPONENT: return "removeComponent";
+            case COMPONENTS_CHANGE: return "componentsChange";
             default: throw new RuntimeException("Invalid server code: " + code);
         }
     }

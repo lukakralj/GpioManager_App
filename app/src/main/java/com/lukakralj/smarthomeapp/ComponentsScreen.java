@@ -3,34 +3,56 @@ package com.lukakralj.smarthomeapp;
 import android.app.ListActivity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import com.lukakralj.smarthomeapp.backend.GpioComponent;
+import com.lukakralj.smarthomeapp.backend.ServerConnection;
+import com.lukakralj.smarthomeapp.backend.logger.Level;
+import com.lukakralj.smarthomeapp.backend.logger.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComponentsScreen extends ListActivity {
 
-    private static List<GpioComponent> components;
-    private static ComponentsAdapter curAdapter;
+    private static List<GpioComponent> components = new ArrayList<>();
+    private ComponentsAdapter curAdapter;
+    private boolean itemsEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_components_screen);
+        itemsEnabled = true;
 
-        components = new ArrayList<>();
         components.add(new GpioComponent(0, 27, "out", "LED 1", "Description 1"));
         components.add(new GpioComponent(0, 28, "out", "LED 2", "Description 2"));
         components.add(new GpioComponent(0, 29, "out", "LED 3", "Description 3"));
 
         curAdapter = new ComponentsAdapter(this, components);
         setListAdapter(curAdapter);
+
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), (data) -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::enableAll);
+        });
+
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), (data) -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::disableAll);
+        });
+
+        if (!ServerConnection.getInstance().isConnected()) {
+            disableAll();
+        }
     }
 
     @Override
@@ -38,18 +60,28 @@ public class ComponentsScreen extends ListActivity {
         super.onListItemClick(list, vi, position, id);
     }
 
-    public static void addComponent(GpioComponent component) {
+    public void addComponent(GpioComponent component) {
         components.add(component);
         curAdapter.notifyDataSetChanged();
     }
 
-    public static void removeComponent(int componentId) {
+    public void removeComponent(int componentId) {
         for (int i = 0; i < components.size(); ++i) {
             if (components.get(i).getId() == componentId) {
                 components.remove(i);
                 break;
             }
         }
+        curAdapter.notifyDataSetChanged();
+    }
+
+    private void disableAll() {
+        itemsEnabled = false;
+        curAdapter.notifyDataSetChanged();
+    }
+
+    private void enableAll() {
+        itemsEnabled = true;
         curAdapter.notifyDataSetChanged();
     }
 
@@ -80,6 +112,16 @@ public class ComponentsScreen extends ListActivity {
         }
 
         @Override
+        public boolean isEnabled(int position) {
+            return itemsEnabled;
+        }
+
+        @Override
+        public boolean areAllItemsEnabled() {
+            return itemsEnabled;
+        }
+
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View vi = convertView;
             if (vi == null) {
@@ -90,17 +132,29 @@ public class ComponentsScreen extends ListActivity {
 
             if (data.get(position).getDirection().equals("out")) {
                 RadioGroup toggle = (RadioGroup) vi.findViewById(R.id.toggle);
+                RadioButton toggleOn = vi.findViewById(R.id.toggleOn);
+                RadioButton toggleOff = vi.findViewById(R.id.toggleOff);
+
                 toggle.setOnCheckedChangeListener(null);
                 if (data.get(position).getIsOn()) {
-                    toggle.check(vi.findViewById(R.id.toggleOn).getId());
+                    toggle.check(toggleOn.getId());
                 }
                 else {
-                    toggle.check(vi.findViewById(R.id.toggleOff).getId());
+                    toggle.check(toggleOff.getId());
                 }
-                ((RadioGroup) vi.findViewById(R.id.toggle)).setOnCheckedChangeListener((radioGroup, checkedId) -> {
+                toggle.setOnCheckedChangeListener((radioGroup, checkedId) -> {
                     data.get(position).setIsOn(!data.get(position).getIsOn());
                     notifyDataSetChanged();
                 });
+
+                if (itemsEnabled) {
+                    toggleOn.setEnabled(true);
+                    toggleOff.setEnabled(true);
+                }
+                else {
+                    toggleOn.setEnabled(false);
+                    toggleOff.setEnabled(false);
+                }
             }
 
             return vi;
