@@ -1,4 +1,4 @@
-package com.lukakralj.smarthomeapp.backend;
+package com.lukakralj.iotControlApp.backend;
 
 public enum RequestCode {
     SERVER_KEY,

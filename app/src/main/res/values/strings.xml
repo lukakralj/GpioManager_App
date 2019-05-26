@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smart Home App</string>
+    <string name="app_name">IoT Control App</string>
     <string name="usernameHint">Username</string>
     <string name="passwordHint">Password</string>
     <string name="loginButton">Login</string>

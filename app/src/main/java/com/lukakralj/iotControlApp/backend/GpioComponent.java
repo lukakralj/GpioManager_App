@@ -1,4 +1,4 @@
-package com.lukakralj.smarthomeapp.backend;
+package com.lukakralj.iotControlApp.backend;
 
 import org.json.JSONException;
 import org.json.JSONObject;

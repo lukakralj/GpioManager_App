@@ -1,6 +1,5 @@
-package com.lukakralj.smarthomeapp.backend.logger;
+package com.lukakralj.iotControlApp.backend.logger;
 
-import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;

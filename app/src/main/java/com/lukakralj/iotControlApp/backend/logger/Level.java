@@ -1,4 +1,4 @@
-package com.lukakralj.smarthomeapp.backend.logger;
+package com.lukakralj.iotControlApp.backend.logger;
 
 /**
  * Represents the severity of the message logged.

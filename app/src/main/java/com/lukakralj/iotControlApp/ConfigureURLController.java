@@ -1,4 +1,4 @@
-package com.lukakralj.smarthomeapp;
+package com.lukakralj.iotControlApp;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.lukakralj.smarthomeapp.backend.ServerConnection;
+import com.lukakralj.iotControlApp.backend.ServerConnection;
 
 public class ConfigureURLController extends AppCompatActivity {
 

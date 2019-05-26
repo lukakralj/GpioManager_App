@@ -1,4 +1,4 @@
-package com.lukakralj.smarthomeapp;
+package com.lukakralj.iotControlApp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,4 +1,4 @@
-package com.lukakralj.smarthomeapp;
+package com.lukakralj.iotControlApp;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -13,11 +13,11 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import com.lukakralj.smarthomeapp.backend.GpioComponent;
-import com.lukakralj.smarthomeapp.backend.RequestCode;
-import com.lukakralj.smarthomeapp.backend.ServerConnection;
-import com.lukakralj.smarthomeapp.backend.logger.Level;
-import com.lukakralj.smarthomeapp.backend.logger.Logger;
+import com.lukakralj.iotControlApp.backend.GpioComponent;
+import com.lukakralj.iotControlApp.backend.RequestCode;
+import com.lukakralj.iotControlApp.backend.ServerConnection;
+import com.lukakralj.iotControlApp.backend.logger.Level;
+import com.lukakralj.iotControlApp.backend.logger.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;

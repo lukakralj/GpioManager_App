@@ -1,23 +1,12 @@
-package com.lukakralj.smarthomeapp;
+package com.lukakralj.iotControlApp;
 
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import com.lukakralj.smarthomeapp.backend.RequestCode;
-import com.lukakralj.smarthomeapp.backend.ServerConnection;
-import com.lukakralj.smarthomeapp.backend.logger.Level;
-import com.lukakralj.smarthomeapp.backend.logger.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 
 /**
