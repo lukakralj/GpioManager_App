@@ -11,8 +11,13 @@ import java.util.Map;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Looper;
 import android.os.Process;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.lukakralj.smarthomeapp.backend.RequestCode.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,6 +85,7 @@ e.printStackTrace();
      * @param newUrl New url of the server.
      */
     public static void reconnect(String newUrl) {
+        Logger.log("Reconnecting with: " + newUrl);
         instance.stopThread();
         try {
             instance.join();
@@ -255,6 +261,10 @@ e.printStackTrace();
         for (OnDisconnectListener l : onDisconnectListeners.values()) {
             l.disconnected(data);
         }
+    }
+
+    public void setAccessToken(String newToken) {
+        accessToken = newToken;
     }
 
     public boolean isConnected() {

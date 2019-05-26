@@ -1,5 +1,6 @@
 package com.lukakralj.smarthomeapp;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ public class ConfigureURLController extends AppCompatActivity {
 
         newUrl = (EditText) findViewById(R.id.newUrlInput);
         newUrl.setText(ServerConnection.getInstance().getCurrentUrl());
+
         final Button cancelButton = (Button) findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(v -> onBackPressed());
 
@@ -34,6 +36,11 @@ public class ConfigureURLController extends AppCompatActivity {
             newUrl.setBackgroundColor(Color.RED);
             return;
         }
+
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("url", url);
+        editor.apply();
 
         ServerConnection.reconnect(url);
         onBackPressed();

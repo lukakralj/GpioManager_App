@@ -1,6 +1,7 @@
 package com.lukakralj.smarthomeapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -70,6 +71,18 @@ public class LoginScreenController extends AppCompatActivity {
         if (!ServerConnection.getInstance().isConnected()) {
             disableAll();
             loginMessage.setText(R.string.waitingConnection);
+        }
+
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        String url = prefs.getString("url", null);
+        if (url != null) {
+            ServerConnection.reconnect(url);
+        }
+
+        String token = prefs.getString("accessToken", null);
+        if (token != null) {
+            ServerConnection.getInstance().setAccessToken(token);
+            startHomeActivity();
         }
     }
 
@@ -158,6 +171,10 @@ e.printStackTrace();
             try {
                 Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
+                    SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("accessToken", data.getString("accessToken"));
+                    editor.apply();
                     startHomeActivity();
                 }
                 else {
