@@ -37,6 +37,7 @@
             android:textSize="15sp" />
 
         <TextView
+            android:id="@+id/subtitle"
             style="@style/SubtitleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,6 +46,7 @@
     </LinearLayout>
 
     <RadioGroup
+        android:id="@+id/toggle"
         android:layout_width="90dp"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
