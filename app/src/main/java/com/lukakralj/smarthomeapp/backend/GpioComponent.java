@@ -1,5 +1,8 @@
 package com.lukakralj.smarthomeapp.backend;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class GpioComponent {
 
     private int id;
@@ -18,6 +21,23 @@ public class GpioComponent {
         this.description = description;
         this.isOn = false;
         this.curValue = -1;
+    }
+
+    public GpioComponent(JSONObject data) throws JSONException {
+        this.id = data.getInt("id");
+        this.physicalPin = data.getInt("physicalPin");
+        this.direction = data.getString("direction");
+        this.name = data.getString("name");
+        this.description = data.getString("description");
+        this.isOn = false;
+        this.curValue = -1;
+
+        if (this.direction.equals("out")) {
+            this.isOn = data.getBoolean("isOn");
+        }
+        else {
+            this.curValue = data.getInt("curValue");
+        }
     }
 
     public int getId() {

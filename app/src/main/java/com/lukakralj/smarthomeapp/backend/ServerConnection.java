@@ -4,7 +4,10 @@ import com.lukakralj.smarthomeapp.backend.logger.Level;
 import com.lukakralj.smarthomeapp.backend.logger.Logger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
+import java.util.Map;
+
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import android.os.Process;
@@ -25,11 +28,29 @@ public class ServerConnection extends Thread {
 
     private Socket io;
     private boolean stop;
+    private boolean connected;
+    private Map<Class, OnConnectListener> onConnectListeners;
+    private Map<Class, OnDisconnectListener> onDisconnectListeners;
 
     private ServerConnection() {
         try {
             Logger.log("Connecting to: " + url);
             io = IO.socket(url);
+
+            io.on(Socket.EVENT_CONNECT, (data) -> {
+                connected = true;
+                for (OnConnectListener l : onConnectListeners.values()) {
+                    l.connected(data);
+                }
+            });
+
+            io.on(Socket.EVENT_DISCONNECT, (data) -> {
+                connected = false;
+                for (OnDisconnectListener l : onDisconnectListeners.values()) {
+                    l.disconnected(data);
+                }
+            });
+
             io.connect();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -70,6 +91,8 @@ e.printStackTrace();
             Logger.log(e.getMessage(), Level.ERROR);
 e.printStackTrace();
         }
+        instance.io.disconnect();
+        instance.io.close();
         instance = null;
         url = newUrl;
         getInstance();
@@ -95,9 +118,7 @@ e.printStackTrace();
         });*/
         while (!stop) {
             try {
-                synchronized (this) {
-                    wait(2);
-                }
+                sleep(1);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
@@ -195,8 +216,13 @@ e.printStackTrace();
      * @param expectEncryptedResponse True if the expected response is encrypted or not.
      *                                Usually, this should be true, unless for initial key exchange.
      */
-    public void scheduleRequest(RequestCode requestCode, JSONObject extraData, boolean expectEncryptedResponse, ResponseListener listener) {
+    public boolean scheduleRequest(RequestCode requestCode, JSONObject extraData, boolean expectEncryptedResponse, ResponseListener listener) {
+        if (!connected) {
+            // Prevent spamming.
+            return false;
+        }
         events.add(new ServerEvent(requestCode, extraData, expectEncryptedResponse, listener));
+        return true;
     }
 
     /**
@@ -208,10 +234,21 @@ e.printStackTrace();
      * @param expectEncryptedResponse True if the expected response is encrypted or not.
      *                                Usually, this should be true, unless for initial key exchange.
      */
-    public void scheduleRequest(RequestCode requestCode, boolean expectEncryptedResponse, ResponseListener listener) {
-        events.add(new ServerEvent(requestCode, null, expectEncryptedResponse, listener));
+    public boolean scheduleRequest(RequestCode requestCode, boolean expectEncryptedResponse, ResponseListener listener) {
+        return scheduleRequest(requestCode, null, expectEncryptedResponse, listener);
     }
 
+    public void subscribeOnConnectEvent(Class subscriber, OnConnectListener listener) {
+        onConnectListeners.put(subscriber, listener);
+    }
+
+    public void subscribeOnDisconnectEvent(Class subscriber, OnDisconnectListener listener) {
+        onDisconnectListeners.put(subscriber, listener);
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
     /**
      * Combines the details about each request to be send to the server.
      */

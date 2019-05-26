@@ -16,7 +16,8 @@ import java.util.List;
 
 public class ComponentsScreen extends ListActivity {
 
-    List<GpioComponent> components;
+    private static List<GpioComponent> components;
+    private static ComponentsAdapter curAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +29,8 @@ public class ComponentsScreen extends ListActivity {
         components.add(new GpioComponent(0, 28, "out", "LED 2", "Description 2"));
         components.add(new GpioComponent(0, 29, "out", "LED 3", "Description 3"));
 
-        CustomAdapter adapter = new CustomAdapter(this, components);
-        setListAdapter(adapter);
+        curAdapter = new ComponentsAdapter(this, components);
+        setListAdapter(curAdapter);
     }
 
     @Override
@@ -37,12 +38,27 @@ public class ComponentsScreen extends ListActivity {
         super.onListItemClick(list, vi, position, id);
     }
 
-    private class CustomAdapter extends BaseAdapter {
+    public static void addComponent(GpioComponent component) {
+        components.add(component);
+        curAdapter.notifyDataSetChanged();
+    }
+
+    public static void removeComponent(int componentId) {
+        for (int i = 0; i < components.size(); ++i) {
+            if (components.get(i).getId() == componentId) {
+                components.remove(i);
+                break;
+            }
+        }
+        curAdapter.notifyDataSetChanged();
+    }
+
+    private class ComponentsAdapter extends BaseAdapter {
         Context context;
         List<GpioComponent> data;
         private LayoutInflater inflater;
 
-        private CustomAdapter(Context context, List<GpioComponent> data) {
+        private ComponentsAdapter(Context context, List<GpioComponent> data) {
             this.context = context;
             this.data = data;
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
