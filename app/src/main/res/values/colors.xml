@@ -2,15 +2,16 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorAccentDarker">#BE2156</color>
-    <color name="colorAccentDisabled">#C02F59</color>
-    <color name="colorAccentDarkerDisabled">#741431</color>
-    <color name="colorBackgroundLogin">#92FFBE00</color>
-    <color name="colorLoginText">#706D6D</color>
-    <color name="colourNormalText">#000000</color>
-    <color name="transparent">#00000000</color>
-    <color name="white">#FFFFFF</color>
+    <color name="colorToggle">#FF4081</color>
+    <color name="colorToggleDarker">#BE2156</color>
+    <color name="colorToggleDisabled">#C02F59</color>
+    <color name="colorToggleDarkerDisabled">#741431</color>
+    <color name="colorMainBackground">#92FFBE00</color>
+    <color name="colorHintText">#706D6D</color>
+    <color name="colorNormalText">#000000</color>
+    <color name="colorTransparent">#00000000</color>
+    <color name="colorWhite">#FFFFFF</color>
     <color name="colorSubtitles">#524D4D</color>
-    <color name="grayDisabled">#ADA5A5</color>
+    <color name="colorGrayDisabled">#BEB6B6</color>
+    <color name="colorMsg">#706D6D</color>
 </resources>

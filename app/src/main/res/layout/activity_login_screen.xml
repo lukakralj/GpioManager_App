@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".LoginScreenController"
-    android:background="@color/colorBackgroundLogin">
+    android:background="@color/colorMainBackground">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/loginToolbar"
@@ -57,16 +57,13 @@
 
     <Button
         android:id="@+id/loginButton"
-        style="@style/LoginText"
+        style="@style/NormalButton"
         android:layout_width="118dp"
         android:layout_height="55dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:text="@string/loginButton"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,15 +71,13 @@
 
     <TextView
         android:id="@+id/loginMessage"
-        style="@style/LoginText"
+        style="@style/Message"
         android:layout_width="290dp"
         android:layout_height="46dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="44dp"
         android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textStyle="italic"
+        android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"

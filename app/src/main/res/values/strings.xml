@@ -24,4 +24,7 @@
     <string name="retrievingData">Retrieving data&#8230;</string>
     <string name="sthWentWrong">Something went wrong :/</string>
     <string name="upToDate">Up to date.</string>
+    <string name="addCompBtnDescription">Add new component button</string>
+    <string name="editCompBtnDescription">Edit component button</string>
+    <string name="logout">Logout</string>
 </resources>

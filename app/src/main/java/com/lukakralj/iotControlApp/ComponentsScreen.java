@@ -174,7 +174,13 @@ public class ComponentsScreen extends ListActivity {
                 vi = inflater.inflate(R.layout.component_toggle, null);
             }
             ((TextView) vi.findViewById(R.id.mainTitle)).setText(data.get(position).getName());
-            ((TextView) vi.findViewById(R.id.subtitle)).setText(data.get(position).getDescription());
+            // roughly 28 characters plus 3 dots can fit on the screen nicely.
+            // TODO: check if you can enforce this in xml
+            String description = data.get(position).getDescription();
+            if (description.length() > 28) {
+                description = description.substring(0, 28) + "&#8230;";
+            }
+            ((TextView) vi.findViewById(R.id.subtitle)).setText(description);
 
             if (data.get(position).getDirection().equals("out")) {
                 RadioGroup toggle = (RadioGroup) vi.findViewById(R.id.toggle);
