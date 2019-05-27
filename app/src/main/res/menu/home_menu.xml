@@ -5,6 +5,6 @@
         android:id="@+id/configureURLhome"
         android:title="@string/configure" />
     <item
-        android:id="@+id/Logout"
+        android:id="@+id/logoutHome"
         android:title="@string/logout" />
 </menu>

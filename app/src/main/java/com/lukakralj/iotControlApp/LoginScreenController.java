@@ -56,16 +56,24 @@ public class LoginScreenController extends AppCompatActivity {
 
         ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(this::enableAll);
-            loginMessage.setText("");
-            Logger.log("login onConnect listener called", Level.DEBUG);
+            handler.post(() -> {
+                loginMessage.setText("");
+                enableAll();
+                SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+                String token = prefs.getString("accessToken", null);
+                if (token != null && ServerConnection.getInstance().isConnected()) {
+                    ServerConnection.getInstance().setAccessToken(token);
+                    startHomeActivity();
+                }
+            });
         });
 
         ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(this::disableAll);
-            loginMessage.setText(R.string.waitingConnection);
-            Logger.log("login onDisconnect listener called", Level.DEBUG);
+            handler.post(() -> {
+                loginMessage.setText(R.string.waitingConnection);
+                enableAll();
+            });
         });
 
         if (!ServerConnection.getInstance().isConnected()) {
@@ -80,7 +88,7 @@ public class LoginScreenController extends AppCompatActivity {
         }
 
         String token = prefs.getString("accessToken", null);
-        if (token != null) {
+        if (token != null && ServerConnection.getInstance().isConnected()) {
             ServerConnection.getInstance().setAccessToken(token);
             startHomeActivity();
         }

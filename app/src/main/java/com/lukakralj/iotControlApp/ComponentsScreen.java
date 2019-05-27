@@ -2,6 +2,7 @@ package com.lukakralj.iotControlApp;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -33,6 +35,7 @@ public class ComponentsScreen extends ListActivity {
     private boolean itemsEnabled;
     private TextView componentsMsg;
     private boolean joinedRoom;
+    private ImageButton newComponentBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,10 @@ public class ComponentsScreen extends ListActivity {
         setListAdapter(curAdapter);
 
         componentsMsg = (TextView) findViewById(R.id.componentsMsg);
+        ((ImageButton) findViewById(R.id.newComponentBtn)).setOnClickListener((view) -> {
+            // TODO: implement
+            Logger.log("New component clicked");
+        });
 
         ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
@@ -159,19 +166,24 @@ public class ComponentsScreen extends ListActivity {
 
         @Override
         public boolean isEnabled(int position) {
-            return itemsEnabled;
+            return false; // Make false otherwise the whole row is clickable.
         }
 
         @Override
         public boolean areAllItemsEnabled() {
-            return itemsEnabled;
+            return false;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View vi = convertView;
             if (vi == null) {
-                vi = inflater.inflate(R.layout.component_toggle, null);
+                if (data.get(position).getDirection().equals("out")) {
+                    vi = inflater.inflate(R.layout.component_toggle, null);
+                }
+                else {
+                    // render "IN" component
+                }
             }
             ((TextView) vi.findViewById(R.id.mainTitle)).setText(data.get(position).getName());
             // roughly 28 characters plus 3 dots can fit on the screen nicely.
@@ -217,23 +229,19 @@ public class ComponentsScreen extends ListActivity {
                     });
                 });
 
-                if (itemsEnabled) {
-                    toggleOn.setEnabled(true);
-                    toggleOff.setEnabled(true);
-                }
-                else {
-                    toggleOn.setEnabled(false);
-                    toggleOff.setEnabled(false);
-                }
-            }
-
-            // needed for correct rendering
-            if (ServerConnection.getInstance().isConnected()) {
-                vi.setEnabled(true);
+                toggleOn.setEnabled(itemsEnabled);
+                toggleOff.setEnabled(itemsEnabled);
             }
             else {
-                vi.setEnabled(false);
+                // render "IN" component
             }
+
+            ((ImageButton) vi.findViewById(R.id.editButton)).setOnClickListener((view) -> {
+                Logger.log("Edit clicked for item: " + data.get(position).getName() + " (id: " + data.get(position).getId() + ").");
+            });
+
+            // needed for correct rendering
+            vi.setEnabled(itemsEnabled);
 
             return vi;
         }

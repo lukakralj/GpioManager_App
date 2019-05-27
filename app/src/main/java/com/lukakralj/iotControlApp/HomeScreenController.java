@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import com.lukakralj.iotControlApp.backend.logger.Logger;
+
 
 /**
  * This will be the main screen of the app once the user is logged in.
@@ -43,6 +45,11 @@ public class HomeScreenController extends AppCompatActivity {
         if (id == R.id.configureURLhome) {
             // open url config activity
             showDialog();
+            return true;
+        }
+        else if (id == R.id.logoutHome) {
+            // TODO: implement
+            Logger.log("User logged out.");
             return true;
         }
 
