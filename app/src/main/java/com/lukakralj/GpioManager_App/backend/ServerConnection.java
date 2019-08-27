@@ -7,12 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import io.socket.client.IO;
 import io.socket.client.Socket;
-
 import android.os.Process;
-
 import static com.lukakralj.GpioManager_App.backend.RequestCode.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,18 +104,7 @@ e.printStackTrace();
     public void run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
         Logger.log("Run started", Level.DEBUG);
-        // TODO: uncomment if using encryption
-        /*scheduleRequest(SERVER_KEY, false, data -> {
-            Logger.log("Data:" + data.toString(), Level.DEBUG);
-            try {
-                Crypto.getInstance().setServerPublicKey(data.getString("serverKey"));
-                Logger.log("Received server key: {" + data.getString("serverKey") + "}", Level.DEBUG);
-            }
-            catch (JSONException e) {
-                Logger.log(e.getMessage(), Level.ERROR);
-e.printStackTrace();
-            }
-        });*/
+
         while (!stop) {
             try {
                 sleep(1);
@@ -143,8 +129,8 @@ e.printStackTrace();
         String code = getCodeString(event.requestCode);
 
         // include accessToken to every request that needs it
-        // only serverKey and login don't need the token
-        if (event.requestCode != SERVER_KEY && event.requestCode != LOGIN) {
+        // only login doesn't need the token
+        if (event.requestCode != LOGIN) {
             if (event.extraData == null) {
                 event.extraData = new JSONObject();
             }
@@ -159,33 +145,11 @@ e.printStackTrace();
             }
         }
 
-        // TODO: uncommendt if using encryption
-        /*String toSend = null;
-        if (event.requestCode != SERVER_KEY) {
-            String encoded = Crypto.getInstance().rsaEncrypt(event.extraData);
-            if (encoded == null) {
-                Logger.log("Couldn't encode the message: " + event.extraData.toString());
-                return;
-            }
-            toSend = encoded;
-        }// else we don't have a key so we cannot rsaEncrypt
-        */
         io.emit(code, event.extraData);
 
         io.once(code + "Res", args -> {
             try {
-                JSONObject data;
-                // TODO: uncomment if using encryption
-                /*if (event.expectEncryptedResponse) {
-                    data = Crypto.getInstance().rsaDecrypt((String) args[0]);
-                    if (data == null) {
-                        Logger.log("Couldn't decode the message for: " + code + "Res");
-                        return;
-                    }
-                }
-                else {*/
-                    data = (JSONObject)args[0];
-                //}
+                JSONObject data = (JSONObject)args[0];
                 if (event.requestCode == LOGIN && data.getString("status").equals("OK")) {
                     accessToken = data.getString("accessToken");
                 }
@@ -296,7 +260,6 @@ e.printStackTrace();
      */
     private String getCodeString(RequestCode code) {
         switch (code) {
-            case SERVER_KEY: return "serverKey";
             case LOGIN: return "login";
             case JOIN_COMPONENTS_ROOM: return "joinComponentsRoom";
             case LEAVE_COMPONENTS_ROOM: return "leaveComponentsRoom";

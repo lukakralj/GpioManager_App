@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
-import com.lukakralj.GpioManager_App.backend.Crypto;
+
 import com.lukakralj.GpioManager_App.backend.RequestCode;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 import com.lukakralj.GpioManager_App.backend.logger.Level;
@@ -39,7 +39,6 @@ public class LoginScreenController extends AppCompatActivity {
         // TODO: where to put this?
         Logger.startLogger();
         ServerConnection.getInstance();
-        Crypto.getInstance();
 
         setContentView(R.layout.activity_login_screen);
 
@@ -167,7 +166,6 @@ public class LoginScreenController extends AppCompatActivity {
         try {
             extraData.put("username", username);
             extraData.put("password", password);
-            extraData.put("clientKey", Crypto.getInstance().getPublicKey());
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
