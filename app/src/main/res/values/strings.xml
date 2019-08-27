@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IoT Control App</string>
+    <string name="app_name">GPIO Manager</string>
     <string name="usernameHint">Username</string>
     <string name="passwordHint">Password</string>
     <string name="loginButton">Login</string>
@@ -27,4 +27,11 @@
     <string name="addCompBtnDescription">Add new component button</string>
     <string name="editCompBtnDescription">Edit component button</string>
     <string name="logout">Logout</string>
+    <string name="newComponent">New component</string>
+
+    <string name="name">Name</string>
+    <string name="physicalPin">Physical pin</string>
+    <string name="pinType">Pin type</string>
+    <string name="in">IN</string>
+    <string name="out">OUT</string>
 </resources>

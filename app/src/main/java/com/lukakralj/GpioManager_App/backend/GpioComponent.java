@@ -1,4 +1,4 @@
-package com.lukakralj.iotControlApp.backend;
+package com.lukakralj.GpioManager_App.backend;
 
 import org.json.JSONException;
 import org.json.JSONObject;

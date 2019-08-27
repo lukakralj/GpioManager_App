@@ -1,7 +1,7 @@
-package com.lukakralj.iotControlApp.backend;
+package com.lukakralj.GpioManager_App.backend;
 
-import com.lukakralj.iotControlApp.backend.logger.Level;
-import com.lukakralj.iotControlApp.backend.logger.Logger;
+import com.lukakralj.GpioManager_App.backend.logger.Level;
+import com.lukakralj.GpioManager_App.backend.logger.Logger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import io.socket.client.Socket;
 
 import android.os.Process;
 
-import static com.lukakralj.iotControlApp.backend.RequestCode.*;
+import static com.lukakralj.GpioManager_App.backend.RequestCode.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 

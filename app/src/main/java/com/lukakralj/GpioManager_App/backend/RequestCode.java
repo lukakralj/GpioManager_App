@@ -1,4 +1,4 @@
-package com.lukakralj.iotControlApp.backend;
+package com.lukakralj.GpioManager_App.backend;
 
 public enum RequestCode {
     SERVER_KEY,

@@ -1,4 +1,4 @@
-package com.lukakralj.iotControlApp.backend.logger;
+package com.lukakralj.GpioManager_App.backend.logger;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;

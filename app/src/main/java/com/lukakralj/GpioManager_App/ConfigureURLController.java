@@ -1,4 +1,4 @@
-package com.lukakralj.iotControlApp;
+package com.lukakralj.GpioManager_App;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.lukakralj.iotControlApp.backend.ServerConnection;
+import com.lukakralj.GpioManager_App.backend.ServerConnection;
 
 public class ConfigureURLController extends AppCompatActivity {
 

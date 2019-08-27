@@ -1,8 +1,7 @@
-package com.lukakralj.iotControlApp;
+package com.lukakralj.GpioManager_App;
 
 import android.app.ListActivity;
 import android.content.Context;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,11 +14,11 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import com.lukakralj.iotControlApp.backend.GpioComponent;
-import com.lukakralj.iotControlApp.backend.RequestCode;
-import com.lukakralj.iotControlApp.backend.ServerConnection;
-import com.lukakralj.iotControlApp.backend.logger.Level;
-import com.lukakralj.iotControlApp.backend.logger.Logger;
+import com.lukakralj.GpioManager_App.backend.GpioComponent;
+import com.lukakralj.GpioManager_App.backend.RequestCode;
+import com.lukakralj.GpioManager_App.backend.ServerConnection;
+import com.lukakralj.GpioManager_App.backend.logger.Level;
+import com.lukakralj.GpioManager_App.backend.logger.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +27,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ComponentsScreen extends ListActivity {
+public class ComponentsScreenController extends ListActivity {
 
     private static List<GpioComponent> components = new ArrayList<>();
     private ComponentsAdapter curAdapter;
@@ -233,10 +232,11 @@ public class ComponentsScreen extends ListActivity {
                 toggleOff.setEnabled(itemsEnabled);
             }
             else {
-                // render "IN" component
+                // TODO: render "IN" component
             }
 
             ((ImageButton) vi.findViewById(R.id.editButton)).setOnClickListener((view) -> {
+                // TODO: implement
                 Logger.log("Edit clicked for item: " + data.get(position).getName() + " (id: " + data.get(position).getId() + ").");
             });
 

@@ -1,14 +1,13 @@
-package com.lukakralj.iotControlApp;
+package com.lukakralj.GpioManager_App;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-
-import com.lukakralj.iotControlApp.backend.logger.Logger;
 
 
 /**
@@ -26,7 +25,7 @@ public class HomeScreenController extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         ((Button) findViewById(R.id.componentsButton)).setOnClickListener((view) -> {
-            Intent intent = new Intent(this, ComponentsScreen.class);
+            Intent intent = new Intent(this, ComponentsScreenController.class);
             startActivity(intent);
         });
     }
@@ -48,8 +47,7 @@ public class HomeScreenController extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.logoutHome) {
-            // TODO: implement
-            Logger.log("User logged out.");
+            logoutUser();
             return true;
         }
 
@@ -68,6 +66,18 @@ public class HomeScreenController extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // do nothing...
+    }
+
+    private void logoutUser() {
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("accessToken");
+        editor.apply();
+
+        // TODO: send to logout request to server
+
+        Intent intent = new Intent(this, LoginScreenController.class);
+        startActivity(intent);
     }
 
 }

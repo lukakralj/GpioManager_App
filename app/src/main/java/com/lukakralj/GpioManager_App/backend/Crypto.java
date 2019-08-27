@@ -1,4 +1,4 @@
-package com.lukakralj.iotControlApp.backend;
+package com.lukakralj.GpioManager_App.backend;
 
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -9,8 +9,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import android.util.Base64;
-import com.lukakralj.iotControlApp.backend.logger.Level;
-import com.lukakralj.iotControlApp.backend.logger.Logger;
+import com.lukakralj.GpioManager_App.backend.logger.Level;
+import com.lukakralj.GpioManager_App.backend.logger.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;

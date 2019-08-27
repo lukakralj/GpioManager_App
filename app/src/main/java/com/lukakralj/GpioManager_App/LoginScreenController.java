@@ -1,4 +1,4 @@
-package com.lukakralj.iotControlApp;
+package com.lukakralj.GpioManager_App;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,11 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
-import com.lukakralj.iotControlApp.backend.Crypto;
-import com.lukakralj.iotControlApp.backend.RequestCode;
-import com.lukakralj.iotControlApp.backend.ServerConnection;
-import com.lukakralj.iotControlApp.backend.logger.Level;
-import com.lukakralj.iotControlApp.backend.logger.Logger;
+import com.lukakralj.GpioManager_App.backend.Crypto;
+import com.lukakralj.GpioManager_App.backend.RequestCode;
+import com.lukakralj.GpioManager_App.backend.ServerConnection;
+import com.lukakralj.GpioManager_App.backend.logger.Level;
+import com.lukakralj.GpioManager_App.backend.logger.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
