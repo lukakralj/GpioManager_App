@@ -8,7 +8,7 @@
     android:background="@color/colorMainBackground">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/homeToolbar"
+        android:id="@+id/newComponentToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -21,10 +21,10 @@
     </android.support.v7.widget.Toolbar>
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/compNameInput"
         style="@style/NormalText"
         android:autofillHints=""
-        android:labelFor="@id/editText2"
+        android:labelFor="@id/compNameInput"
         android:layout_width="327dp"
         android:layout_height="46dp"
         android:layout_marginStart="40dp"
@@ -42,13 +42,13 @@
         android:layout_marginTop="36dp"
         android:text="@string/name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homeToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/newComponentToolbar" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/compPinInput"
         style="@style/NormalText"
         android:autofillHints=""
-        android:labelFor="@id/editText3"
+        android:labelFor="@id/compPinInput"
         android:layout_width="93dp"
         android:layout_height="39dp"
         android:layout_marginStart="40dp"
@@ -66,27 +66,81 @@
         android:layout_marginTop="44dp"
         android:text="@string/physicalPin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText2" />
+        app:layout_constraintTop_toBottomOf="@+id/compNameInput" />
 
     <Switch
-        android:id="@+id/switch1"
+        android:id="@+id/compTypeInput"
         android:layout_width="140dp"
         android:layout_height="37dp"
-        android:layout_marginStart="84dp"
+        style="@style/NormalText"
+        android:layout_marginStart="92dp"
         android:layout_marginTop="8dp"
-        android:textOff="@string/out"
-        android:textOn="@string/in"
-        app:layout_constraintStart_toEndOf="@+id/editText3"
+        android:textOff="@string/outPin"
+        android:textOn="@string/inPin"
+        android:text="@string/outPin"
+        app:layout_constraintStart_toEndOf="@+id/compPinInput"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="108dp"
         android:layout_marginTop="44dp"
         android:text="@string/pinType"
         app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/editText2" />
+        app:layout_constraintTop_toBottomOf="@+id/compNameInput" />
+
+    <EditText
+        android:id="@+id/compDescriptionInput"
+        style="@style/NormalText"
+        android:background="@drawable/description_border"
+        android:layout_width="327dp"
+        android:layout_height="193dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:autofillHints=""
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:labelFor="@id/compDescriptionInput"
+        android:lines="8"
+        android:maxLines="10"
+        android:minLines="6"
+        android:gravity="top|start"
+        android:scrollbars="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/compPinInput" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="44dp"
+        android:text="@string/cancel"
+        style="@style/NormalButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/compDescriptionInput" />
+
+    <Button
+        android:id="@+id/createButton"
+        style="@style/NormalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="84dp"
+        android:text="@string/create"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/compDescriptionInput" />
 
 </android.support.constraint.ConstraintLayout>

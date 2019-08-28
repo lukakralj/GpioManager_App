@@ -28,10 +28,13 @@
     <string name="editCompBtnDescription">Edit component button</string>
     <string name="logout">Logout</string>
     <string name="newComponent">New component</string>
-
+    <string name="editComponent">Edit component</string>
+    <string name="create">Create</string>
+    <string name="save">Save</string>
     <string name="name">Name</string>
     <string name="physicalPin">Physical pin</string>
     <string name="pinType">Pin type</string>
-    <string name="in">IN</string>
-    <string name="out">OUT</string>
+    <string name="inPin">IN pin</string>
+    <string name="outPin">OUT pin</string>
+    <string name="description">Description</string>
 </resources>

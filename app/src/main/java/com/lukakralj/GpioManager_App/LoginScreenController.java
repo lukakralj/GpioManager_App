@@ -94,7 +94,7 @@ public class LoginScreenController extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.login_menu, menu);
+        getMenuInflater().inflate(R.menu.base_menu, menu);
         return true;
     }
 

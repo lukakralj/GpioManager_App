@@ -2,10 +2,13 @@ package com.lukakralj.GpioManager_App;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -45,8 +48,8 @@ public class ComponentsScreenController extends ListActivity {
 
         componentsMsg = (TextView) findViewById(R.id.componentsMsg);
         ((ImageButton) findViewById(R.id.newComponentBtn)).setOnClickListener((view) -> {
-            // TODO: implement
-            Logger.log("New component clicked");
+            Intent intent = new Intent(this, NewComponentController.class);
+            startActivity(intent);
         });
 
         ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
@@ -68,6 +71,30 @@ public class ComponentsScreenController extends ListActivity {
         else {
             retrieveData();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.base_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.configureURLlogin) {
+            // open url config activity
+            showUrlDialog();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    void showUrlDialog() {
+        Intent intent = new Intent(this, ConfigureURLController.class);
+        startActivity(intent);
     }
 
     @Override
@@ -133,6 +160,12 @@ public class ComponentsScreenController extends ListActivity {
         });
 
         super.onBackPressed();
+    }
+
+    private void startEditComponentActivity(GpioComponent componentToEdit) {
+        Intent intent = new Intent(this, ConfigureURLController.class);
+        intent.putExtra("editComp", componentToEdit);
+        startActivity(intent);
     }
 
     private class ComponentsAdapter extends BaseAdapter {
@@ -234,10 +267,7 @@ public class ComponentsScreenController extends ListActivity {
                 // TODO: render "IN" component
             }
 
-            ((ImageButton) vi.findViewById(R.id.editButton)).setOnClickListener((view) -> {
-                // TODO: implement
-                Logger.log("Edit clicked for item: " + data.get(position).getName() + " (id: " + data.get(position).getId() + ").");
-            });
+            ((ImageButton) vi.findViewById(R.id.editButton)).setOnClickListener((view) -> startEditComponentActivity(data.get(position)));
 
             // needed for correct rendering
             vi.setEnabled(itemsEnabled);

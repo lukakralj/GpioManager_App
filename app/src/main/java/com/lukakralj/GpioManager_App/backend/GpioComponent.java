@@ -3,7 +3,9 @@ package com.lukakralj.GpioManager_App.backend;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GpioComponent {
+import java.io.Serializable;
+
+public class GpioComponent implements Serializable {
 
     private int id;
     private int physicalPin;

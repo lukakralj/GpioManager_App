@@ -11,25 +11,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.lukakralj.GpioManager_App.NewComponentController"></activity>
+        <activity android:name=".EditComponentController"></activity>
+        <activity android:name=".NewComponentController" />
         <activity
-            android:name="com.lukakralj.GpioManager_App.ComponentsScreenController"
+            android:name=".ComponentsScreenController"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.lukakralj.GpioManager_App.ConfigureURLController"
+            android:name=".ConfigureURLController"
             android:configChanges="orientation"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.lukakralj.GpioManager_App.HomeScreenController"
+            android:name=".HomeScreenController"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.lukakralj.GpioManager_App.LoginScreenController"
+            android:name=".LoginScreenController"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">

@@ -28,11 +28,17 @@ public class HomeScreenController extends AppCompatActivity {
             Intent intent = new Intent(this, ComponentsScreenController.class);
             startActivity(intent);
         });
+
+        ((Button) findViewById(R.id.logoutButton)).setOnClickListener((view) -> {
+            logoutUser();
+        });
+
+        // TODO: add on connect and disconnect event
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_menu, menu);
+        getMenuInflater().inflate(R.menu.base_menu, menu);
         return true;
     }
 
@@ -40,13 +46,9 @@ public class HomeScreenController extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.configureURLhome) {
+        if (id == R.id.configureURLlogin) {
             // open url config activity
             showUrlDialog();
-            return true;
-        }
-        else if (id == R.id.logoutHome) {
-            logoutUser();
             return true;
         }
 
