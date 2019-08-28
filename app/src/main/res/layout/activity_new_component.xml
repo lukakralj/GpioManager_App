@@ -123,24 +123,38 @@
 
     <Button
         android:id="@+id/cancelButton"
+        style="@style/NormalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="84dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="28dp"
         android:text="@string/cancel"
-        style="@style/NormalButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/compDescriptionInput" />
+        app:layout_constraintTop_toBottomOf="@+id/newCompMessage" />
 
     <Button
         android:id="@+id/createButton"
         style="@style/NormalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="84dp"
         android:text="@string/create"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/newCompMessage" />
+
+    <TextView
+        android:id="@+id/newCompMessage"
+        style="@style/Message"
+        android:layout_width="290dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="8dp"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/compDescriptionInput" />
 
 </android.support.constraint.ConstraintLayout>

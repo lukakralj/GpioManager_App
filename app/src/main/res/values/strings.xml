@@ -37,4 +37,11 @@
     <string name="inPin">IN pin</string>
     <string name="outPin">OUT pin</string>
     <string name="description">Description</string>
+    <string name="emptyName">Please enter name first.</string>
+    <string name="emptyPinNo">Please enter the pin number.</string>
+    <string name="invalidPinNo">Pin number must be between 24 and 34, inclusive.</string>
+    <string name="creationFailed">Component could not be created.</string>
+    <string name="creationOK">Component created successfully.</string>
+    <string name="updateFailed">Component could not be updated.</string>
+    <string name="updateOK">Component updated successfully.</string>
 </resources>
