@@ -1,6 +1,7 @@
 package com.lukakralj.GpioManager_App;
 
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +9,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.lukakralj.GpioManager_App.backend.RequestCode;
+import com.lukakralj.GpioManager_App.backend.ServerConnection;
 
 
 /**
@@ -71,11 +76,18 @@ public class HomeScreenController extends AppCompatActivity {
 
     private void logoutUser() {
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+
+        // Remove token from prefs.
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove("accessToken");
         editor.apply();
 
-        // TODO: send to logout request to server
+        // Send request.
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LOGOUT, null, data -> {
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.logoutOK, duration);
+            toast.show();
+        });
 
         Intent intent = new Intent(this, LoginScreenController.class);
         startActivity(intent);

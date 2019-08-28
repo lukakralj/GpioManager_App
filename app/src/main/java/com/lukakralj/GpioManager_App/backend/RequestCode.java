@@ -2,6 +2,7 @@ package com.lukakralj.GpioManager_App.backend;
 
 public enum RequestCode {
     LOGIN,
+    LOGOUT,
     JOIN_COMPONENTS_ROOM,
     LEAVE_COMPONENTS_ROOM,
     COMPONENTS,

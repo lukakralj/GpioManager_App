@@ -56,7 +56,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:layout_toStartOf="@id/editButton"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:background="@drawable/pink_out_line"
         android:checkedButton="@+id/toggleOff"
@@ -90,15 +90,5 @@
             android:text="@string/OFF"
             android:textColor="@color/colorWhite" />
     </RadioGroup>
-
-    <ImageButton
-        android:id="@+id/editButton"
-        android:layout_marginStart="10dp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@string/editCompBtnDescription"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
 
 </RelativeLayout>

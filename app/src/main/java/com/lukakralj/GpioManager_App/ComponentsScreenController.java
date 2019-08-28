@@ -196,7 +196,7 @@ public class ComponentsScreenController extends ListActivity {
 
         @Override
         public boolean isEnabled(int position) {
-            return false; // Make false otherwise the whole row is clickable.
+            return true; // If true, the whole row is clickable.
         }
 
         @Override
@@ -267,7 +267,7 @@ public class ComponentsScreenController extends ListActivity {
                 // TODO: render "IN" component
             }
 
-            ((ImageButton) vi.findViewById(R.id.editButton)).setOnClickListener((view) -> startEditComponentActivity(data.get(position)));
+            vi.setOnClickListener(v -> startEditComponentActivity(data.get(position)));
 
             // needed for correct rendering
             vi.setEnabled(itemsEnabled);

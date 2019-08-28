@@ -257,6 +257,7 @@ e.printStackTrace();
     private String getCodeString(RequestCode code) {
         switch (code) {
             case LOGIN: return "login";
+            case LOGOUT: return "logout";
             case JOIN_COMPONENTS_ROOM: return "joinComponentsRoom";
             case LEAVE_COMPONENTS_ROOM: return "leaveComponentsRoom";
             case COMPONENTS: return "components";

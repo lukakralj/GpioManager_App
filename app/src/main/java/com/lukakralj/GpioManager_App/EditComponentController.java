@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +33,10 @@ public class EditComponentController extends AppCompatActivity {
     private EditText compDescriptionInput;
     private Button cancelButton;
     private Button createButton;
+    private ImageButton deleteButton;
     private TextView editComMessage;
+
+    private GpioComponent component;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +49,16 @@ public class EditComponentController extends AppCompatActivity {
         compDescriptionInput = (EditText) findViewById(R.id.compDescriptionInput);
         cancelButton = (Button) findViewById(R.id.cancelButton);
         createButton = (Button) findViewById(R.id.createButton);
+        deleteButton = (ImageButton) findViewById(R.id.deleteButton);
         editComMessage = (TextView) findViewById(R.id.editCompMessage);
         editComMessage.setText("");
 
         cancelButton.setOnClickListener(v -> onBackPressed());
         createButton.setOnClickListener(this::updateComponent);
-
+        deleteButton.setOnClickListener(this::deleteComponent);
 
         Intent i = getIntent();
-        GpioComponent component = (GpioComponent) i.getSerializableExtra("editComp");
+        component = (GpioComponent) i.getSerializableExtra("editComp");
         if (component == null) {
             // No component to edit. Go to components screen.
             Intent intent = new Intent(this, ComponentsScreenController.class);
@@ -140,9 +145,21 @@ public class EditComponentController extends AppCompatActivity {
         editComMessage.setText(R.string.updateFailed);
     }
 
+    private void deleteUnsuccessful() {
+        editComMessage.setText(R.string.deleteFailed);
+    }
+
     private void updateSuccessful() {
+        notifySuccessful(R.string.updateOK);
+    }
+
+    private void deleteSuccessful() {
+        notifySuccessful(R.string.deleteOK);
+    }
+
+    private void notifySuccessful(int stringId) {
         int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(getApplicationContext(), R.string.updateOK, duration);
+        Toast toast = Toast.makeText(getApplicationContext(), stringId, duration);
         toast.show();
 
         Intent intent = new Intent(this, ComponentsScreenController.class);
@@ -166,6 +183,35 @@ public class EditComponentController extends AppCompatActivity {
             return;
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.UPDATE_COMPONENT, extraData, data -> {
+            try {
+                Logger.log("data: " + data.toString(), Level.DEBUG);
+                if (data.getString("status").equals("OK")) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(this::updateSuccessful);
+                }
+                else {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(this::updateUnsuccessful);
+                }
+            }
+            catch (JSONException e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void deleteComponent(View v) {
+        JSONObject extraData = new JSONObject();
+        try {
+            extraData.put("", component.getId());
+        }
+        catch (JSONException e) {
+            Logger.log(e.getMessage(), Level.ERROR);
+            e.printStackTrace();
+            return;
+        }
+        ServerConnection.getInstance().scheduleRequest(RequestCode.REMOVE_COMPONENT, extraData, data -> {
             try {
                 Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
