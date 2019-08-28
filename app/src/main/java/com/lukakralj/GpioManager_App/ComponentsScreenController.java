@@ -19,11 +19,9 @@ import com.lukakralj.GpioManager_App.backend.RequestCode;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 import com.lukakralj.GpioManager_App.backend.logger.Level;
 import com.lukakralj.GpioManager_App.backend.logger.Logger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,13 +89,13 @@ public class ComponentsScreenController extends ListActivity {
     private void retrieveData() {
         componentsMsg.setText(R.string.retrievingData);
         if (!joinedRoom) {
-            ServerConnection.getInstance().scheduleRequest(RequestCode.JOIN_COMPONENTS_ROOM, false, data -> {
+            ServerConnection.getInstance().scheduleRequest(RequestCode.JOIN_COMPONENTS_ROOM, null, data -> {
                 Logger.log("Joined components room.");
                 joinedRoom = true;
             });
         }
 
-        ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, true, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, null, data -> {
             int msgId;
             try {
                 if (data.getString("status").equals("OK")) {
@@ -129,10 +127,10 @@ public class ComponentsScreenController extends ListActivity {
 
     @Override
     public void onBackPressed() {
-        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, false, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, null, data -> {
             Logger.log("Left components room.");
+            joinedRoom = false;
         });
-        joinedRoom = false;
 
         super.onBackPressed();
     }
@@ -181,7 +179,7 @@ public class ComponentsScreenController extends ListActivity {
                     vi = inflater.inflate(R.layout.component_toggle, null);
                 }
                 else {
-                    // render "IN" component
+                    // TODO: render "IN" component
                 }
             }
             ((TextView) vi.findViewById(R.id.mainTitle)).setText(data.get(position).getName());
@@ -198,6 +196,7 @@ public class ComponentsScreenController extends ListActivity {
                 RadioButton toggleOn = vi.findViewById(R.id.toggleOn);
                 RadioButton toggleOff = vi.findViewById(R.id.toggleOff);
 
+                // must set to null first otherwise an action is fired during setup
                 toggle.setOnCheckedChangeListener(null);
                 if (data.get(position).getIsOn()) {
                     toggle.check(toggleOn.getId());
@@ -216,7 +215,7 @@ public class ComponentsScreenController extends ListActivity {
                         Logger.log(e.getCause().toString(), Level.ERROR);
                         extra = null;
                     }
-                    ServerConnection.getInstance().scheduleRequest(RequestCode.TOGGLE_COMPONENT, extra, true, (serverData) -> {
+                    ServerConnection.getInstance().scheduleRequest(RequestCode.TOGGLE_COMPONENT, extra, (serverData) -> {
                         try {
                             if (serverData.getString("status").equals("OK")) {
                                 Logger.log("Toggle successful for component id: " + data.get(position).getId() + ".");

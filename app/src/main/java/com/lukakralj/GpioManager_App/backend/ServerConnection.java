@@ -106,16 +106,16 @@ e.printStackTrace();
         Logger.log("Run started", Level.DEBUG);
 
         while (!stop) {
+            if (currentEvent != events.size() - 1) { // check if there are any new events
+                currentEvent++;
+                Logger.log("Processing event: " + events.get(currentEvent).requestCode);
+                processEvent(events.get(currentEvent));
+            }
             try {
                 sleep(1);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-            if (currentEvent != events.size() - 1) { // check if there are any new events
-                currentEvent++;
-                Logger.log("Processing event: " + events.get(currentEvent).requestCode);
-                processEvent(events.get(currentEvent));
             }
         }
     }
@@ -172,6 +172,7 @@ e.printStackTrace();
     public String getCurrentUrl() {
         return url;
     }
+
     /**
      * Schedule new request to be sent to the server. Requests are processed in
      * first-come-first-server manner.
@@ -180,29 +181,25 @@ e.printStackTrace();
      * @param listener Specifies what happens when the response is received.
      * @param extraData Specify additional information to be sent to the server. null if no
      *                  additional information needed.
-     * @param expectEncryptedResponse True if the expected response is encrypted or not.
-     *                                Usually, this should be true, unless for initial key exchange.
      */
-    public boolean scheduleRequest(RequestCode requestCode, JSONObject extraData, boolean expectEncryptedResponse, ResponseListener listener) {
+    public boolean scheduleRequest(RequestCode requestCode, JSONObject extraData, ResponseListener listener) {
         if (!connected) {
             // Prevent spamming.
             return false;
         }
-        events.add(new ServerEvent(requestCode, extraData, expectEncryptedResponse, listener));
+        events.add(new ServerEvent(requestCode, extraData, listener));
         return true;
     }
 
     /**
-     * Schedule new request to be sent to the server. Requests are processed in
      * first-come-first-server manner.
+     * Schedule new request to be sent to the server. Requests are processed in
      *
      * @param requestCode Request specific code.
      * @param listener Specifies what happens when the response is received.
-     * @param expectEncryptedResponse True if the expected response is encrypted or not.
-     *                                Usually, this should be true, unless for initial key exchange.
      */
-    public boolean scheduleRequest(RequestCode requestCode, boolean expectEncryptedResponse, ResponseListener listener) {
-        return scheduleRequest(requestCode, null, expectEncryptedResponse, listener);
+    public boolean scheduleRequest(RequestCode requestCode, ResponseListener listener) {
+        return scheduleRequest(requestCode, null, listener);
     }
 
     public void subscribeOnConnectEvent(Class subscriber, SubscriberEvent event) {
@@ -218,8 +215,8 @@ e.printStackTrace();
     }
 
     private void triggerSubscriberEvents(Map<Class, SubscriberEvent> events) {
-        for (SubscriberEvent l : events.values()) {
-            l.triggerEvent();
+        for (SubscriberEvent event : events.values()) {
+            event.triggerEvent();
         }
     }
 
@@ -230,6 +227,7 @@ e.printStackTrace();
     public boolean isConnected() {
         return connected;
     }
+
     /**
      * Combines the details about each request to be send to the server.
      */
@@ -238,17 +236,15 @@ e.printStackTrace();
         private RequestCode requestCode;
         private ResponseListener listener;
         private JSONObject extraData;
-        private boolean expectEncryptedResponse;
 
         /**
          *
          * @param requestCode Request specific code.
          * @param listener Specifies what happens when the response is received.
          */
-        private ServerEvent(RequestCode requestCode, JSONObject extraData, boolean expectEncryptedResponse, ResponseListener listener) {
+        private ServerEvent(RequestCode requestCode, JSONObject extraData, ResponseListener listener) {
             this.requestCode = requestCode;
             this.extraData = extraData;
-            this.expectEncryptedResponse = expectEncryptedResponse;
             this.listener = listener;
         }
     }

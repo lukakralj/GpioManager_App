@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
-
 import com.lukakralj.GpioManager_App.backend.RequestCode;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 import com.lukakralj.GpioManager_App.backend.logger.Level;
@@ -70,8 +69,8 @@ public class LoginScreenController extends AppCompatActivity {
         ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(() -> {
+                disableAll();
                 loginMessage.setText(R.string.waitingConnection);
-                enableAll();
             });
         });
 
@@ -95,7 +94,6 @@ public class LoginScreenController extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.login_menu, menu);
         return true;
     }
@@ -106,14 +104,14 @@ public class LoginScreenController extends AppCompatActivity {
 
         if (id == R.id.configureURLlogin) {
             // open url config activity
-            showDialog();
+            showUrlDialog();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    void showDialog() {
+    void showUrlDialog() {
         Intent intent = new Intent(this, ConfigureURLController.class);
         startActivity(intent);
     }
@@ -173,7 +171,7 @@ e.printStackTrace();
             invalidCredentials();
             return;
         }
-        ServerConnection.getInstance().scheduleRequest(RequestCode.LOGIN, extraData, true, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LOGIN, extraData, data -> {
             try {
                 Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {

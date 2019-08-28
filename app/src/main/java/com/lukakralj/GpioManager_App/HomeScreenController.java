@@ -32,7 +32,6 @@ public class HomeScreenController extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home_menu, menu);
         return true;
     }
@@ -43,7 +42,7 @@ public class HomeScreenController extends AppCompatActivity {
 
         if (id == R.id.configureURLhome) {
             // open url config activity
-            showDialog();
+            showUrlDialog();
             return true;
         }
         else if (id == R.id.logoutHome) {
@@ -54,7 +53,7 @@ public class HomeScreenController extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void showDialog() {
+    void showUrlDialog() {
         Intent intent = new Intent(this, ConfigureURLController.class);
         startActivity(intent);
     }
