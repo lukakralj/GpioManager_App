@@ -46,6 +46,6 @@
     <string name="updateOK">Component updated successfully.</string>
     <string name="logoutOK">User logged out.</string>
     <string name="delete">Delete</string>
-    <string name="deleteFailed">Component could not be updated.</string>
-    <string name="deleteOK">Component updated successfully.</string>
+    <string name="deleteFailed">Component could not be deleted.</string>
+    <string name="deleteOK">Component deleted successfully.</string>
 </resources>

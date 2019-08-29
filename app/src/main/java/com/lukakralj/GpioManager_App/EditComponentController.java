@@ -1,11 +1,11 @@
 package com.lukakralj.GpioManager_App;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,44 +32,47 @@ public class EditComponentController extends AppCompatActivity {
     private Switch compTypeInput;
     private EditText compDescriptionInput;
     private Button cancelButton;
-    private Button createButton;
+    private Button saveButton;
     private ImageButton deleteButton;
     private TextView editComMessage;
 
-    private GpioComponent component;
+    private GpioComponent componentToEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_component);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.editComponentToolbar);
+        setSupportActionBar(myToolbar);
+
         compNameInput = (EditText) findViewById(R.id.compNameInput);
         compPinInput = (EditText) findViewById(R.id.compPinInput);
         compTypeInput = (Switch) findViewById(R.id.compTypeInput);
         compDescriptionInput = (EditText) findViewById(R.id.compDescriptionInput);
         cancelButton = (Button) findViewById(R.id.cancelButton);
-        createButton = (Button) findViewById(R.id.createButton);
+        saveButton = (Button) findViewById(R.id.saveButton);
         deleteButton = (ImageButton) findViewById(R.id.deleteButton);
         editComMessage = (TextView) findViewById(R.id.editCompMessage);
         editComMessage.setText("");
 
         cancelButton.setOnClickListener(v -> onBackPressed());
-        createButton.setOnClickListener(this::updateComponent);
+        saveButton.setOnClickListener(this::updateComponent);
         deleteButton.setOnClickListener(this::deleteComponent);
 
         Intent i = getIntent();
-        component = (GpioComponent) i.getSerializableExtra("editComp");
-        if (component == null) {
+        componentToEdit = (GpioComponent) i.getSerializableExtra("editComp");
+        if (componentToEdit == null) {
             // No component to edit. Go to components screen.
             Intent intent = new Intent(this, ComponentsScreenController.class);
             startActivity(intent);
         }
 
-        compNameInput.setText(component.getName());
-        compPinInput.setText(component.getPhysicalPin());
-        compDescriptionInput.setText(component.getDescription());
+        compNameInput.setText(componentToEdit.getName());
+        compPinInput.setText(String.valueOf(componentToEdit.getPhysicalPin()));
+        compDescriptionInput.setText(componentToEdit.getDescription());
 
-        if (component.getDirection().equals("out")) {
+        if (componentToEdit.getDirection().equals("out")) {
             compTypeInput.setChecked(false);
             compTypeInput.setText(R.string.outPin);
         }
@@ -170,22 +173,25 @@ public class EditComponentController extends AppCompatActivity {
         if (!verifyData()) {
             return;
         }
-        JSONObject extraData = new JSONObject();
+        JSONObject extra = new JSONObject();
+        JSONObject data = new JSONObject();
         try {
-            extraData.put("name", compNameInput.getText().toString());
-            extraData.put("physicalPin", Integer.parseInt(compPinInput.getText().toString()));
-            extraData.put("direction", compTypeInput.getText().toString().equals(getText(R.string.outPin).toString()) ? "out" : "in");
-            extraData.put("description", compDescriptionInput.getText().toString());
+            data.put("name", compNameInput.getText().toString());
+            data.put("physicalPin", Integer.parseInt(compPinInput.getText().toString()));
+            data.put("direction", compTypeInput.getText().toString().equals(getText(R.string.outPin).toString()) ? "out" : "in");
+            data.put("description", compDescriptionInput.getText().toString());
+            extra.put("data", data);
+            extra.put("id", componentToEdit.getId());
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
             e.printStackTrace();
             return;
         }
-        ServerConnection.getInstance().scheduleRequest(RequestCode.UPDATE_COMPONENT, extraData, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.UPDATE_COMPONENT, extra, resData -> {
             try {
-                Logger.log("data: " + data.toString(), Level.DEBUG);
-                if (data.getString("status").equals("OK")) {
+                Logger.log("data: " + resData.toString(), Level.DEBUG);
+                if (resData.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(this::updateSuccessful);
                 }
@@ -202,25 +208,25 @@ public class EditComponentController extends AppCompatActivity {
     }
 
     private void deleteComponent(View v) {
-        JSONObject extraData = new JSONObject();
+        JSONObject extra = new JSONObject();
         try {
-            extraData.put("", component.getId());
+            extra.put("id", componentToEdit.getId());
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
             e.printStackTrace();
             return;
         }
-        ServerConnection.getInstance().scheduleRequest(RequestCode.REMOVE_COMPONENT, extraData, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.REMOVE_COMPONENT, extra, data -> {
             try {
                 Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::updateSuccessful);
+                    handler.post(this::deleteSuccessful);
                 }
                 else {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::updateUnsuccessful);
+                    handler.post(this::deleteUnsuccessful);
                 }
             }
             catch (JSONException e) {

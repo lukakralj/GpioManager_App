@@ -36,7 +36,9 @@ public class LoginScreenController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // TODO: where to put this?
-        Logger.startLogger();
+        if (!Logger.isStarted()) {
+            Logger.startLogger();
+        }
         ServerConnection.getInstance();
 
         setContentView(R.layout.activity_login_screen);
@@ -81,7 +83,7 @@ public class LoginScreenController extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         String url = prefs.getString("url", null);
-        if (url != null) {
+        if (url != null && !ServerConnection.getInstance().isConnected()) {
             ServerConnection.reconnect(url);
         }
 

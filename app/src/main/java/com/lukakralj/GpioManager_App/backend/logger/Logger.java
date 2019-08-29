@@ -100,4 +100,8 @@ public class Logger {
         }
         buffer = new StringBuffer();
     }
+
+    public static boolean isStarted() {
+        return started;
+    }
 }

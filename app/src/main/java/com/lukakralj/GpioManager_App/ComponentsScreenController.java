@@ -41,13 +41,19 @@ public class ComponentsScreenController extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_components_screen);
+
+        /*Toolbar myToolbar = (Toolbar) findViewById(R.id.editComponentToolbar);
+        setSupportActionBar(myToolbar);*/
+
+
         itemsEnabled = true;
 
         curAdapter = new ComponentsAdapter(this, components);
         setListAdapter(curAdapter);
 
         componentsMsg = (TextView) findViewById(R.id.componentsMsg);
-        ((ImageButton) findViewById(R.id.newComponentBtn)).setOnClickListener((view) -> {
+        newComponentBtn = (ImageButton) findViewById(R.id.newComponentBtn);
+        newComponentBtn.setOnClickListener((view) -> {
             Intent intent = new Intent(this, NewComponentController.class);
             startActivity(intent);
         });
@@ -123,31 +129,31 @@ public class ComponentsScreenController extends ListActivity {
         }
 
         ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, null, data -> {
-            int msgId;
-            try {
-                if (data.getString("status").equals("OK")) {
-                    JSONArray comps = data.getJSONArray("components");
-                    components.clear();
-                    for (int i = 0; i < comps.length(); ++i) {
-                        Logger.log(comps.getJSONObject(i).toString(), Level.DEBUG);
-                        components.add(new GpioComponent(comps.getJSONObject(i)));
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                int msgId;
+                try {
+                    if (data.getString("status").equals("OK")) {
+                        JSONArray comps = data.getJSONArray("components");
+                        components.clear();
+                        for (int i = 0; i < comps.length(); ++i) {
+                            Logger.log(comps.getJSONObject(i).toString(), Level.DEBUG);
+                            components.add(new GpioComponent(comps.getJSONObject(i)));
+                        }
+                        msgId = R.string.upToDate;
                     }
-                    msgId = R.string.upToDate;
+                    else {
+                        msgId = R.string.sthWentWrong;
+                    }
                 }
-                else {
+                catch (JSONException e) {
+                    Logger.log(e.getLocalizedMessage(), Level.ERROR);
+                    e.printStackTrace();
                     msgId = R.string.sthWentWrong;
                 }
-            }
-            catch (JSONException e) {
-                Logger.log(e.getLocalizedMessage(), Level.ERROR);
-                e.printStackTrace();
-                msgId = R.string.sthWentWrong;
-            }
-            Handler handler = new Handler(Looper.getMainLooper());
-            final int id = msgId;
-            handler.post(() -> {
+
                 curAdapter.notifyDataSetChanged();
-                componentsMsg.setText(id);
+                componentsMsg.setText(msgId);
             });
         });
     }
@@ -159,11 +165,12 @@ public class ComponentsScreenController extends ListActivity {
             joinedRoom = false;
         });
 
-        super.onBackPressed();
+        Intent intent = new Intent(this, HomeScreenController.class);
+        startActivity(intent);
     }
 
     private void startEditComponentActivity(GpioComponent componentToEdit) {
-        Intent intent = new Intent(this, ConfigureURLController.class);
+        Intent intent = new Intent(this, EditComponentController.class);
         intent.putExtra("editComp", componentToEdit);
         startActivity(intent);
     }
@@ -220,7 +227,7 @@ public class ComponentsScreenController extends ListActivity {
             // TODO: check if you can enforce this in xml
             String description = data.get(position).getDescription();
             if (description.length() > 28) {
-                description = description.substring(0, 28) + "&#8230;";
+                description = description.substring(0, 28) + "...";
             }
             ((TextView) vi.findViewById(R.id.subtitle)).setText(description);
 

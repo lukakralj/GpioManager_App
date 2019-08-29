@@ -3,12 +3,15 @@ package com.lukakralj.GpioManager_App;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lukakralj.GpioManager_App.backend.RequestCode;
@@ -21,6 +24,10 @@ import com.lukakralj.GpioManager_App.backend.ServerConnection;
  */
 public class HomeScreenController extends AppCompatActivity {
 
+    private Button componentsButton;
+    private Button logoutButton;
+    private TextView homeMessage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,16 +36,43 @@ public class HomeScreenController extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.homeToolbar);
         setSupportActionBar(myToolbar);
 
-        ((Button) findViewById(R.id.componentsButton)).setOnClickListener((view) -> {
+        homeMessage = (TextView) findViewById(R.id.homeMessage);
+        componentsButton = (Button) findViewById(R.id.componentsButton);
+        componentsButton.setOnClickListener((view) -> {
             Intent intent = new Intent(this, ComponentsScreenController.class);
             startActivity(intent);
         });
 
-        ((Button) findViewById(R.id.logoutButton)).setOnClickListener((view) -> {
+        logoutButton = (Button) findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener((view) -> {
             logoutUser();
         });
 
-        // TODO: add on connect and disconnect event
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                enableAll();
+                homeMessage.setText("");
+            });
+        });
+
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                disableAll();
+                homeMessage.setText(R.string.waitingConnection);
+            });
+        });
+    }
+
+    private void enableAll() {
+        logoutButton.setEnabled(true);
+        componentsButton.setEnabled(true);
+    }
+
+    private void disableAll() {
+        logoutButton.setEnabled(false);
+        componentsButton.setEnabled(false);
     }
 
     @Override
@@ -84,9 +118,12 @@ public class HomeScreenController extends AppCompatActivity {
 
         // Send request.
         ServerConnection.getInstance().scheduleRequest(RequestCode.LOGOUT, null, data -> {
-            int duration = Toast.LENGTH_LONG;
-            Toast toast = Toast.makeText(getApplicationContext(), R.string.logoutOK, duration);
-            toast.show();
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                int duration = Toast.LENGTH_LONG;
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.logoutOK, duration);
+                toast.show();
+            });
         });
 
         Intent intent = new Intent(this, LoginScreenController.class);

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +35,9 @@ public class NewComponentController extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_component);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.newComponentToolbar);
+        setSupportActionBar(myToolbar);
 
         compNameInput = (EditText) findViewById(R.id.compNameInput);
         compPinInput = (EditText) findViewById(R.id.compPinInput);
@@ -129,22 +133,24 @@ public class NewComponentController extends AppCompatActivity {
         if (!verifyData()) {
             return;
         }
-        JSONObject extraData = new JSONObject();
+        JSONObject extra = new JSONObject();
+        JSONObject data = new JSONObject();
         try {
-            extraData.put("name", compNameInput.getText().toString());
-            extraData.put("physicalPin", Integer.parseInt(compPinInput.getText().toString()));
-            extraData.put("direction", compTypeInput.getText().toString().equals(getText(R.string.outPin).toString()) ? "out" : "in");
-            extraData.put("description", compDescriptionInput.getText().toString());
+            data.put("name", compNameInput.getText().toString());
+            data.put("physicalPin", Integer.parseInt(compPinInput.getText().toString()));
+            data.put("direction", compTypeInput.getText().toString().equals(getText(R.string.outPin).toString()) ? "out" : "in");
+            data.put("description", compDescriptionInput.getText().toString());
+            extra.put("data", data);
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
             e.printStackTrace();
             return;
         }
-        ServerConnection.getInstance().scheduleRequest(RequestCode.ADD_COMPONENT, extraData, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.ADD_COMPONENT, extra, resData -> {
             try {
-                Logger.log("data: " + data.toString(), Level.DEBUG);
-                if (data.getString("status").equals("OK")) {
+                Logger.log("data: " + resData.toString(), Level.DEBUG);
+                if (resData.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(this::creationSuccessful);
                 }
