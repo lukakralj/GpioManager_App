@@ -61,7 +61,6 @@ public class ComponentsScreenController extends ListActivity {
         ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
-            retrieveData();
         });
 
         ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
@@ -71,11 +70,11 @@ public class ComponentsScreenController extends ListActivity {
 
         ServerConnection.getInstance().subscribeComponentsChangeEvent(this::retrieveData);
 
-        if (!ServerConnection.getInstance().isConnected()) {
-            disableAll();
+        if (ServerConnection.getInstance().isConnected()) {
+            enableAll();
         }
         else {
-            retrieveData();
+            disableAll();
         }
     }
 

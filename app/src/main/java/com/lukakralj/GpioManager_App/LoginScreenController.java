@@ -65,7 +65,10 @@ public class LoginScreenController extends AppCompatActivity {
             handler.post(this::disableAll);
         });
 
-        if (!ServerConnection.getInstance().isConnected()) {
+        if (ServerConnection.getInstance().isConnected()) {
+            enableAll();
+        }
+        else {
             disableAll();
         }
 

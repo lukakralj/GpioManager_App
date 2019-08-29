@@ -57,6 +57,13 @@ public class HomeScreenController extends AppCompatActivity {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
+
+        if (ServerConnection.getInstance().isConnected()) {
+            enableAll();
+        }
+        else {
+            disableAll();
+        }
     }
 
     private void enableAll() {

@@ -99,6 +99,19 @@ public class EditComponentController extends AppCompatActivity {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
+
+        if (ServerConnection.getInstance().isConnected()) {
+            enableAll();
+        }
+        else {
+            disableAll();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, ComponentsScreenController.class);
+        startActivity(intent);
     }
 
     private void enableAll() {
