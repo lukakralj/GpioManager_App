@@ -90,7 +90,37 @@ public class EditComponentController extends AppCompatActivity {
             }
         });
 
-        // TODO: add connect and disconnect events
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::enableAll);
+        });
+
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::disableAll);
+        });
+    }
+
+    private void enableAll() {
+        compNameInput.setEnabled(true);
+        compPinInput.setEnabled(true);
+        compTypeInput.setEnabled(true);
+        compDescriptionInput.setEnabled(true);
+        cancelButton.setEnabled(true);
+        saveButton.setEnabled(true);
+        deleteButton.setEnabled(true);
+        editComMessage.setText(R.string.waitingConnection);
+    }
+
+    private void disableAll() {
+        compNameInput.setEnabled(false);
+        compPinInput.setEnabled(false);
+        compTypeInput.setEnabled(false);
+        compDescriptionInput.setEnabled(false);
+        cancelButton.setEnabled(false);
+        saveButton.setEnabled(false);
+        deleteButton.setEnabled(false);
+        editComMessage.setText("");
     }
 
     @Override

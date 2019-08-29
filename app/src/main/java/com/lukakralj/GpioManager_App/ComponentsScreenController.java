@@ -109,12 +109,15 @@ public class ComponentsScreenController extends ListActivity {
     }
 
     private void disableAll() {
+        newComponentBtn.setEnabled(false);
         componentsMsg.setText(R.string.waitingConnection);
         itemsEnabled = false;
         curAdapter.notifyDataSetChanged();
     }
 
     private void enableAll() {
+        newComponentBtn.setEnabled(true);
+        componentsMsg.setText("");
         itemsEnabled = true;
         retrieveData();
     }

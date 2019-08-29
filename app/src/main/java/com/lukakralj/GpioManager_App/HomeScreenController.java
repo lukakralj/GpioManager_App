@@ -50,29 +50,25 @@ public class HomeScreenController extends AppCompatActivity {
 
         ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
-                enableAll();
-                homeMessage.setText("");
-            });
+            handler.post(this::enableAll);
         });
 
         ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
-                disableAll();
-                homeMessage.setText(R.string.waitingConnection);
-            });
+            handler.post(this::disableAll);
         });
     }
 
     private void enableAll() {
         logoutButton.setEnabled(true);
         componentsButton.setEnabled(true);
+        homeMessage.setText("");
     }
 
     private void disableAll() {
         logoutButton.setEnabled(false);
         componentsButton.setEnabled(false);
+        homeMessage.setText(R.string.waitingConnection);
     }
 
     @Override

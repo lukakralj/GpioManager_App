@@ -62,7 +62,35 @@ public class NewComponentController extends AppCompatActivity {
             }
         });
 
-        // TODO: add connect and disconnect events
+        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::enableAll);
+        });
+
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::disableAll);
+        });
+    }
+
+    private void enableAll() {
+        compNameInput.setEnabled(true);
+        compPinInput.setEnabled(true);
+        compTypeInput.setEnabled(true);
+        compDescriptionInput.setEnabled(true);
+        cancelButton.setEnabled(true);
+        createButton.setEnabled(true);
+        newCompMessage.setText(R.string.waitingConnection);
+    }
+
+    private void disableAll() {
+        compNameInput.setEnabled(false);
+        compPinInput.setEnabled(false);
+        compTypeInput.setEnabled(false);
+        compDescriptionInput.setEnabled(false);
+        cancelButton.setEnabled(false);
+        createButton.setEnabled(false);
+        newCompMessage.setText("");
     }
 
     @Override

@@ -103,7 +103,7 @@ e.printStackTrace();
      */
     public void run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-        Logger.log("Run started", Level.DEBUG);
+        Logger.log("ServerConnection thread started", Level.DEBUG);
 
         while (!stop) {
             if (currentEvent != events.size() - 1) { // check if there are any new events
@@ -266,6 +266,7 @@ e.printStackTrace();
             case ADD_COMPONENT: return "addComponent";
             case REMOVE_COMPONENT: return "removeComponent";
             case COMPONENTS_CHANGE: return "componentsChange";
+            case REFRESH_TOKEN: return "refreshToken";
             default: throw new RuntimeException("Invalid server code: " + code);
         }
     }
