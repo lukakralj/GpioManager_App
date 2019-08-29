@@ -56,29 +56,17 @@ public class LoginScreenController extends AppCompatActivity {
 
         ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
-                loginMessage.setText("");
-                enableAll();
-                SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-                String token = prefs.getString("accessToken", null);
-                if (token != null && ServerConnection.getInstance().isConnected()) {
-                    ServerConnection.getInstance().setAccessToken(token);
-                    startHomeActivity();
-                }
-            });
+            handler.post(this::enableAll);
+            checkTokenAndRedirect();
         });
 
         ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
-                disableAll();
-                loginMessage.setText(R.string.waitingConnection);
-            });
+            handler.post(this::disableAll);
         });
 
         if (!ServerConnection.getInstance().isConnected()) {
             disableAll();
-            loginMessage.setText(R.string.waitingConnection);
         }
 
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
@@ -87,10 +75,31 @@ public class LoginScreenController extends AppCompatActivity {
             ServerConnection.reconnect(url);
         }
 
+        checkTokenAndRedirect();
+    }
+
+    private void checkTokenAndRedirect() {
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         String token = prefs.getString("accessToken", null);
         if (token != null && ServerConnection.getInstance().isConnected()) {
             ServerConnection.getInstance().setAccessToken(token);
-            startHomeActivity();
+
+            ServerConnection.getInstance().scheduleRequest(RequestCode.REFRESH_TOKEN, null, data -> {
+                try {
+                    if (data.getString("status").equals("OK")) {
+                        // Token is valid.
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(this::startHomeActivity);
+                    }
+                    else {
+                        ServerConnection.getInstance().setAccessToken(null);
+                    }
+                }
+                catch (JSONException e) {
+                    Logger.log(e.getMessage(), Level.ERROR);
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
@@ -205,12 +214,14 @@ e.printStackTrace();
     }
 
     private void enableAll() {
+        loginMessage.setText("");
         usernameInput.setEnabled(true);
         passwordInput.setEnabled(true);
         loginButton.setEnabled(true);
     }
 
     private void disableAll() {
+        loginMessage.setText(R.string.waitingConnection);
         usernameInput.setEnabled(false);
         passwordInput.setEnabled(false);
         loginButton.setEnabled(false);
