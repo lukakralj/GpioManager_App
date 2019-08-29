@@ -54,13 +54,13 @@ public class LoginScreenController extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.loginToolbar);
         setSupportActionBar(myToolbar);
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
             checkTokenAndRedirect();
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
@@ -84,7 +84,7 @@ public class LoginScreenController extends AppCompatActivity {
         if (token != null && ServerConnection.getInstance().isConnected()) {
             ServerConnection.getInstance().setAccessToken(token);
 
-            ServerConnection.getInstance().scheduleRequest(RequestCode.REFRESH_TOKEN, null, data -> {
+            ServerConnection.getInstance().scheduleRequest(RequestCode.REFRESH_TOKEN, data -> {
                 try {
                     if (data.getString("status").equals("OK")) {
                         // Token is valid.

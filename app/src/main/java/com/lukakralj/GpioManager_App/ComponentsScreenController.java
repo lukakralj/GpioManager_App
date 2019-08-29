@@ -58,18 +58,18 @@ public class ComponentsScreenController extends ListActivity {
             startActivity(intent);
         });
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
             retrieveData();
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
 
-        ServerConnection.getInstance().subscribeComponentsChangeEvent(this.getClass(), this::retrieveData);
+        ServerConnection.getInstance().subscribeComponentsChangeEvent(this::retrieveData);
 
         if (!ServerConnection.getInstance().isConnected()) {
             disableAll();
@@ -125,13 +125,13 @@ public class ComponentsScreenController extends ListActivity {
     private void retrieveData() {
         componentsMsg.setText(R.string.retrievingData);
         if (!joinedRoom) {
-            ServerConnection.getInstance().scheduleRequest(RequestCode.JOIN_COMPONENTS_ROOM, null, data -> {
+            ServerConnection.getInstance().scheduleRequest(RequestCode.JOIN_COMPONENTS_ROOM, data -> {
                 Logger.log("Joined components room.");
                 joinedRoom = true;
             });
         }
 
-        ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, null, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.COMPONENTS, data -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(() -> {
                 int msgId;
@@ -163,7 +163,7 @@ public class ComponentsScreenController extends ListActivity {
 
     @Override
     public void onBackPressed() {
-        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, null, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, data -> {
             Logger.log("Left components room.");
             joinedRoom = false;
         });

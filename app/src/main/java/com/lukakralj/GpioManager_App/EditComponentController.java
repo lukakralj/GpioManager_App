@@ -90,12 +90,12 @@ public class EditComponentController extends AppCompatActivity {
             }
         });
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
@@ -109,7 +109,7 @@ public class EditComponentController extends AppCompatActivity {
         cancelButton.setEnabled(true);
         saveButton.setEnabled(true);
         deleteButton.setEnabled(true);
-        editComMessage.setText(R.string.waitingConnection);
+        editComMessage.setText("");
     }
 
     private void disableAll() {
@@ -120,7 +120,7 @@ public class EditComponentController extends AppCompatActivity {
         cancelButton.setEnabled(false);
         saveButton.setEnabled(false);
         deleteButton.setEnabled(false);
-        editComMessage.setText("");
+        editComMessage.setText(R.string.waitingConnection);
     }
 
     @Override

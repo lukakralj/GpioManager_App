@@ -23,9 +23,9 @@ public class ServerConnection extends Thread {
     private static List<ServerEvent> events = new ArrayList<>();
     private static int currentEvent = -1;
     private static String accessToken;
-    private static Map<Class, SubscriberEvent> onConnectEvents = new HashMap<>();
-    private static Map<Class, SubscriberEvent> onDisconnectEvents = new HashMap<>();
-    private static Map<Class, SubscriberEvent> onComponentsChangeEvents = new HashMap<>();
+    private static SubscriberEvent onConnectEvent = null;
+    private static SubscriberEvent onDisconnectEvent = null;
+    private static SubscriberEvent onComponentsChangeEvent = null;
 
     private Socket io;
     private boolean stop;
@@ -38,16 +38,22 @@ public class ServerConnection extends Thread {
 
             io.on(Socket.EVENT_CONNECT, (data) -> {
                 connected = true;
-                triggerSubscriberEvents(onConnectEvents);
+                if (onConnectEvent != null) {
+                    onConnectEvent.triggerEvent();
+                }
             });
 
             io.on(Socket.EVENT_DISCONNECT, (data) -> {
                 connected = false;
-                triggerSubscriberEvents(onDisconnectEvents);
+                if (onDisconnectEvent != null) {
+                    onDisconnectEvent.triggerEvent();
+                }
             });
 
             io.on(getCodeString(COMPONENTS_CHANGE), (data) -> {
-                triggerSubscriberEvents(onComponentsChangeEvents);
+                if (onComponentsChangeEvent != null) {
+                    onComponentsChangeEvent.triggerEvent();
+                }
             });
 
             io.connect();
@@ -182,13 +188,12 @@ e.printStackTrace();
      * @param extraData Specify additional information to be sent to the server. null if no
      *                  additional information needed.
      */
-    public boolean scheduleRequest(RequestCode requestCode, JSONObject extraData, ResponseListener listener) {
+    public void scheduleRequest(RequestCode requestCode, JSONObject extraData, ResponseListener listener) {
         if (!connected) {
             // Prevent spamming.
-            return false;
+            return;
         }
         events.add(new ServerEvent(requestCode, extraData, listener));
-        return true;
     }
 
     /**
@@ -198,26 +203,20 @@ e.printStackTrace();
      * @param requestCode Request specific code.
      * @param listener Specifies what happens when the response is received.
      */
-    public boolean scheduleRequest(RequestCode requestCode, ResponseListener listener) {
-        return scheduleRequest(requestCode, null, listener);
+    public void scheduleRequest(RequestCode requestCode, ResponseListener listener) {
+        scheduleRequest(requestCode, null, listener);
     }
 
-    public void subscribeOnConnectEvent(Class subscriber, SubscriberEvent event) {
-        onConnectEvents.put(subscriber, event);
+    public void subscribeOnConnectEvent(SubscriberEvent event) {
+        onConnectEvent = event;
     }
 
-    public void subscribeOnDisconnectEvent(Class subscriber, SubscriberEvent event) {
-        onDisconnectEvents.put(subscriber, event);
+    public void subscribeOnDisconnectEvent(SubscriberEvent event) {
+        onDisconnectEvent = event;
     }
 
-    public void subscribeComponentsChangeEvent(Class subscriber, SubscriberEvent event) {
-        onComponentsChangeEvents.put(subscriber, event);
-    }
-
-    private void triggerSubscriberEvents(Map<Class, SubscriberEvent> events) {
-        for (SubscriberEvent event : events.values()) {
-            event.triggerEvent();
-        }
+    public void subscribeComponentsChangeEvent(SubscriberEvent event) {
+        onComponentsChangeEvent = event;
     }
 
     public void setAccessToken(String newToken) {

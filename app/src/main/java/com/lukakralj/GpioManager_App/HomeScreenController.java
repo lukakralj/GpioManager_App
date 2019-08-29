@@ -48,12 +48,12 @@ public class HomeScreenController extends AppCompatActivity {
             logoutUser();
         });
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
@@ -113,7 +113,7 @@ public class HomeScreenController extends AppCompatActivity {
         editor.apply();
 
         // Send request.
-        ServerConnection.getInstance().scheduleRequest(RequestCode.LOGOUT, null, data -> {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LOGOUT, data -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(() -> {
                 int duration = Toast.LENGTH_LONG;

@@ -62,12 +62,12 @@ public class NewComponentController extends AppCompatActivity {
             }
         });
 
-        ServerConnection.getInstance().subscribeOnConnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::enableAll);
         });
 
-        ServerConnection.getInstance().subscribeOnDisconnectEvent(this.getClass(), () -> {
+        ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(this::disableAll);
         });
@@ -80,7 +80,7 @@ public class NewComponentController extends AppCompatActivity {
         compDescriptionInput.setEnabled(true);
         cancelButton.setEnabled(true);
         createButton.setEnabled(true);
-        newCompMessage.setText(R.string.waitingConnection);
+        newCompMessage.setText("");
     }
 
     private void disableAll() {
@@ -90,7 +90,7 @@ public class NewComponentController extends AppCompatActivity {
         compDescriptionInput.setEnabled(false);
         cancelButton.setEnabled(false);
         createButton.setEnabled(false);
-        newCompMessage.setText("");
+        newCompMessage.setText(R.string.waitingConnection);
     }
 
     @Override
