@@ -216,13 +216,19 @@ public class ComponentsScreenController extends ListActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View vi = convertView;
-            if (vi == null) {
+            /*if (vi == null) {
                 if (data.get(position).getDirection().equals("out")) {
-                    vi = inflater.inflate(R.layout.component_toggle, null);
+                    vi = inflater.inflate(R.layout.out_component, null);
                 }
                 else {
-                    // TODO: render "IN" component
+                    vi = inflater.inflate(R.layout.in_component, null);
                 }
+            }*/
+            if (data.get(position).getDirection().equals("out")) {
+                vi = inflater.inflate(R.layout.out_component, null);
+            }
+            else {
+                vi = inflater.inflate(R.layout.in_component, null);
             }
             ((TextView) vi.findViewById(R.id.mainTitle)).setText(data.get(position).getName());
             // roughly 28 characters plus 3 dots can fit on the screen nicely.
@@ -273,7 +279,16 @@ public class ComponentsScreenController extends ListActivity {
                 toggleOff.setEnabled(itemsEnabled);
             }
             else {
-                // TODO: render "IN" component
+                TextView statusIndicator = (TextView) vi.findViewById(R.id.statusIndicator);
+                if (data.get(position).getCurValue() == 1) {
+                    statusIndicator.setEnabled(true);
+                    statusIndicator.setText(R.string.ON);
+                }
+                else {
+                    statusIndicator.setEnabled(false);
+                    statusIndicator.setText(R.string.OFF);
+                }
+                statusIndicator.setOnClickListener(v -> { /* Do nothing. */ });
             }
 
             vi.setOnClickListener(v -> startEditComponentActivity(data.get(position)));

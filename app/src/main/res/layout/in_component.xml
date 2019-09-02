@@ -49,46 +49,20 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <RadioGroup
-        android:id="@+id/toggle"
-        android:layout_width="100dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="8dp"
+    <TextView
+        android:id="@+id/statusIndicator"
+        android:textSize="20sp"
+        android:layout_width="50dp"
+        android:textAlignment="center"
+        android:gravity="center"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_height="38dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/pink_out_line"
-        android:checkedButton="@+id/toggleOff"
-        android:orientation="horizontal">
+        android:background="@drawable/pink_box"
+        android:textColor="@color/colorWhite"
+        android:text="@string/ON" />
 
-        <RadioButton
-            android:id="@+id/toggleOn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="1dp"
-            android:layout_weight="1"
-            android:background="@drawable/toggle_widget_background"
-            android:button="@null"
-            android:gravity="center"
-            android:text="@string/ON"
-            android:textColor="@color/colorWhite" />
-
-        <RadioButton
-            android:id="@+id/toggleOff"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="1dp"
-            android:layout_marginBottom="1dp"
-            android:layout_weight="1"
-            android:background="@drawable/toggle_widget_background"
-            android:button="@null"
-            android:gravity="center"
-            android:text="@string/OFF"
-            android:textColor="@color/colorWhite" />
-    </RadioGroup>
 
 </RelativeLayout>
