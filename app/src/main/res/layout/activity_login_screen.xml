@@ -60,10 +60,8 @@
     <Button
         android:id="@+id/loginButton"
         style="@style/NormalButton"
-        android:layout_width="118dp"
-        android:layout_height="55dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="64dp"
         android:layout_marginEnd="8dp"
         android:text="@string/loginButton"
         app:layout_constraintEnd_toEndOf="parent"

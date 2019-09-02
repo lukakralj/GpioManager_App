@@ -22,20 +22,20 @@
 
     <ListView
         android:id="@android:id/list"
-        android:layout_width="350dp"
-        android:layout_height="502dp"
+        android:layout_width="309dp"
+        android:layout_height="498dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:dividerHeight="0dp"
+        android:divider="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.488"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newComponentBtn"
-        app:layout_constraintVertical_bias="0.138">
-
-    </ListView>
+        app:layout_constraintVertical_bias="0.138" />
 
     <!-- Displayed if list is empty. -->
     <TextView
@@ -69,13 +69,16 @@
 
     <ImageButton
         android:id="@+id/newComponentBtn"
-        android:contentDescription="@string/addCompBtnDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="28dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/addCompBtnDescription"
         android:src="@android:drawable/ic_input_add"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.896"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/componentsScreenToolbar" />
 
     <include layout="@layout/loading_screen" />
