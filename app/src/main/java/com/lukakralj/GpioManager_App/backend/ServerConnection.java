@@ -4,9 +4,7 @@ import com.lukakralj.GpioManager_App.backend.logger.Level;
 import com.lukakralj.GpioManager_App.backend.logger.Logger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import android.os.Process;
@@ -18,7 +16,7 @@ import org.json.JSONObject;
  * This class enables communication with the main server.
  */
 public class ServerConnection extends Thread {
-    private static String url = "http://04478faf.ngrok.io";
+    private static String url = "";
     private static ServerConnection instance;
     private static List<ServerEvent> events = new ArrayList<>();
     private static int currentEvent = -1;
