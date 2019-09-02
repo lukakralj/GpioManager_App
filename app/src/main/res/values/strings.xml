@@ -48,4 +48,9 @@
     <string name="delete">Delete</string>
     <string name="deleteFailed">Component could not be deleted.</string>
     <string name="deleteOK">Component deleted successfully.</string>
+    <string name="settingUp">Setting up</string>
+    <string name="verifyingUser">Verifying user</string>
+    <string name="creatingComponent">Creating component</string>
+    <string name="deletingComponent">Deleting component</string>
+    <string name="updatingComponent">Updating component</string>
 </resources>

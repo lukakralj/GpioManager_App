@@ -30,6 +30,8 @@ public class LoginScreenController extends AppCompatActivity {
     private EditText passwordInput;
     private Button loginButton;
     private TextView loginMessage;
+    private View loadingScreen;
+    private TextView loadingScreenMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,9 @@ public class LoginScreenController extends AppCompatActivity {
         usernameInput = (EditText) findViewById(R.id.usernameInput);
         passwordInput = (EditText) findViewById(R.id.passwordInput);
         loginMessage = (TextView) findViewById(R.id.loginMessage);
+        loadingScreen = (View) findViewById(R.id.loadingScreen);
+        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
+        loadingScreenON(getText(R.string.settingUp));
         resetAll();
 
         loginButton = (Button) findViewById(R.id.loginButton);
@@ -86,13 +91,17 @@ public class LoginScreenController extends AppCompatActivity {
         String token = prefs.getString("accessToken", null);
         if (token != null && ServerConnection.getInstance().isConnected()) {
             ServerConnection.getInstance().setAccessToken(token);
-
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                disableAll();
+                loadingScreenON(getText(R.string.verifyingUser));
+            });
             ServerConnection.getInstance().scheduleRequest(RequestCode.REFRESH_TOKEN, data -> {
                 try {
                     if (data.getString("status").equals("OK")) {
                         // Token is valid.
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        handler.post(this::startHomeActivity);
+                        Handler handler1 = new Handler(Looper.getMainLooper());
+                        handler1.post(this::startHomeActivity);
                     }
                     else {
                         ServerConnection.getInstance().setAccessToken(null);
@@ -207,6 +216,16 @@ e.printStackTrace();
         });
     }
 
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
     /**
      * Clears all input boxes and messages.
      */
@@ -217,14 +236,14 @@ e.printStackTrace();
     }
 
     private void enableAll() {
-        loginMessage.setText("");
+        loadingScreenOFF();
         usernameInput.setEnabled(true);
         passwordInput.setEnabled(true);
         loginButton.setEnabled(true);
     }
 
     private void disableAll() {
-        loginMessage.setText(R.string.waitingConnection);
+        loadingScreenON(getText(R.string.waitingConnection));
         usernameInput.setEnabled(false);
         passwordInput.setEnabled(false);
         loginButton.setEnabled(false);

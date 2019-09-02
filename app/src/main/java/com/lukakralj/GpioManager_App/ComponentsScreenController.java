@@ -36,15 +36,20 @@ public class ComponentsScreenController extends ListActivity {
     private TextView componentsMsg;
     private boolean joinedRoom;
     private ImageButton newComponentBtn;
+    private View loadingScreen;
+    private TextView loadingScreenMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_components_screen);
 
+        // TODO: enable this (doesn't work because of ListActivity
         /*Toolbar myToolbar = (Toolbar) findViewById(R.id.editComponentToolbar);
         setSupportActionBar(myToolbar);*/
 
+        loadingScreen = (View) findViewById(R.id.loadingScreen);
+        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
 
         itemsEnabled = true;
 
@@ -60,7 +65,10 @@ public class ComponentsScreenController extends ListActivity {
 
         ServerConnection.getInstance().subscribeOnConnectEvent(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(this::enableAll);
+            handler.post(() -> {
+                enableAll();
+                retrieveData();
+            });
         });
 
         ServerConnection.getInstance().subscribeOnDisconnectEvent(() -> {
@@ -68,14 +76,28 @@ public class ComponentsScreenController extends ListActivity {
             handler.post(this::disableAll);
         });
 
-        ServerConnection.getInstance().subscribeComponentsChangeEvent(this::retrieveData);
+        ServerConnection.getInstance().subscribeComponentsChangeEvent(() -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(this::retrieveData);
+        });
 
         if (ServerConnection.getInstance().isConnected()) {
             enableAll();
+            retrieveData();
         }
         else {
             disableAll();
         }
+    }
+
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
     }
 
     @Override
@@ -108,21 +130,22 @@ public class ComponentsScreenController extends ListActivity {
     }
 
     private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
         newComponentBtn.setEnabled(false);
-        componentsMsg.setText(R.string.waitingConnection);
         itemsEnabled = false;
         curAdapter.notifyDataSetChanged();
     }
 
     private void enableAll() {
+        loadingScreenOFF();
         newComponentBtn.setEnabled(true);
-        componentsMsg.setText("");
         itemsEnabled = true;
-        retrieveData();
+        curAdapter.notifyDataSetChanged();
     }
 
     private void retrieveData() {
-        componentsMsg.setText(R.string.retrievingData);
+        disableAll();
+        loadingScreenON(getText(R.string.retrievingData));
         if (!joinedRoom) {
             ServerConnection.getInstance().scheduleRequest(RequestCode.JOIN_COMPONENTS_ROOM, data -> {
                 Logger.log("Joined components room.");
@@ -156,6 +179,7 @@ public class ComponentsScreenController extends ListActivity {
 
                 curAdapter.notifyDataSetChanged();
                 componentsMsg.setText(msgId);
+                enableAll();
             });
         });
     }

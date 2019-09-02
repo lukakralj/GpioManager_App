@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,8 @@ public class HomeScreenController extends AppCompatActivity {
     private Button componentsButton;
     private Button logoutButton;
     private TextView homeMessage;
+    private View loadingScreen;
+    private TextView loadingScreenMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,8 @@ public class HomeScreenController extends AppCompatActivity {
             Intent intent = new Intent(this, ComponentsScreenController.class);
             startActivity(intent);
         });
+        loadingScreen = (View) findViewById(R.id.loadingScreen);
+        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
 
         logoutButton = (Button) findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener((view) -> {
@@ -66,16 +71,26 @@ public class HomeScreenController extends AppCompatActivity {
         }
     }
 
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
     private void enableAll() {
+        loadingScreenOFF();
         logoutButton.setEnabled(true);
         componentsButton.setEnabled(true);
-        homeMessage.setText("");
     }
 
     private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
         logoutButton.setEnabled(false);
         componentsButton.setEnabled(false);
-        homeMessage.setText(R.string.waitingConnection);
     }
 
     @Override

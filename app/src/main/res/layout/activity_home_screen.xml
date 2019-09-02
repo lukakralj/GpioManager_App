@@ -64,4 +64,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/componentsButton" />
 
+    <include layout="@layout/loading_screen" />
+
 </android.support.constraint.ConstraintLayout>

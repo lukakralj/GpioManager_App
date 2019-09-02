@@ -35,6 +35,8 @@ public class EditComponentController extends AppCompatActivity {
     private Button saveButton;
     private ImageButton deleteButton;
     private TextView editComMessage;
+    private View loadingScreen;
+    private TextView loadingScreenMsg;
 
     private GpioComponent componentToEdit;
 
@@ -55,7 +57,8 @@ public class EditComponentController extends AppCompatActivity {
         deleteButton = (ImageButton) findViewById(R.id.deleteButton);
         editComMessage = (TextView) findViewById(R.id.editCompMessage);
         editComMessage.setText("");
-
+        loadingScreen = (View) findViewById(R.id.loadingScreen);
+        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
         cancelButton.setOnClickListener(v -> onBackPressed());
         saveButton.setOnClickListener(this::updateComponent);
         deleteButton.setOnClickListener(this::deleteComponent);
@@ -108,6 +111,16 @@ public class EditComponentController extends AppCompatActivity {
         }
     }
 
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, ComponentsScreenController.class);
@@ -115,6 +128,7 @@ public class EditComponentController extends AppCompatActivity {
     }
 
     private void enableAll() {
+        loadingScreenOFF();
         compNameInput.setEnabled(true);
         compPinInput.setEnabled(true);
         compTypeInput.setEnabled(true);
@@ -122,10 +136,10 @@ public class EditComponentController extends AppCompatActivity {
         cancelButton.setEnabled(true);
         saveButton.setEnabled(true);
         deleteButton.setEnabled(true);
-        editComMessage.setText("");
     }
 
     private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
         compNameInput.setEnabled(false);
         compPinInput.setEnabled(false);
         compTypeInput.setEnabled(false);
@@ -133,7 +147,6 @@ public class EditComponentController extends AppCompatActivity {
         cancelButton.setEnabled(false);
         saveButton.setEnabled(false);
         deleteButton.setEnabled(false);
-        editComMessage.setText(R.string.waitingConnection);
     }
 
     @Override
@@ -213,7 +226,10 @@ public class EditComponentController extends AppCompatActivity {
     }
 
     private void updateComponent(View v) {
+        disableAll();
+        loadingScreenON(getText(R.string.updatingComponent));
         if (!verifyData()) {
+            enableAll();
             return;
         }
         JSONObject extra = new JSONObject();
@@ -229,6 +245,7 @@ public class EditComponentController extends AppCompatActivity {
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
             e.printStackTrace();
+            enableAll();
             return;
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.UPDATE_COMPONENT, extra, resData -> {
@@ -236,11 +253,17 @@ public class EditComponentController extends AppCompatActivity {
                 Logger.log("data: " + resData.toString(), Level.DEBUG);
                 if (resData.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::updateSuccessful);
+                    handler.post(() -> {
+                        enableAll();
+                        updateSuccessful();
+                    });
                 }
                 else {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::updateUnsuccessful);
+                    handler.post(() -> {
+                        enableAll();
+                        updateUnsuccessful();
+                    });
                 }
             }
             catch (JSONException e) {
@@ -251,6 +274,8 @@ public class EditComponentController extends AppCompatActivity {
     }
 
     private void deleteComponent(View v) {
+        disableAll();
+        loadingScreenON(getText(R.string.deletingComponent));
         JSONObject extra = new JSONObject();
         try {
             extra.put("id", componentToEdit.getId());
@@ -265,11 +290,17 @@ public class EditComponentController extends AppCompatActivity {
                 Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::deleteSuccessful);
+                    handler.post(() -> {
+                        enableAll();
+                        deleteSuccessful();
+                    });
                 }
                 else {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::deleteUnsuccessful);
+                    handler.post(() -> {
+                        enableAll();
+                        deleteUnsuccessful();
+                    });
                 }
             }
             catch (JSONException e) {

@@ -30,6 +30,8 @@ public class NewComponentController extends AppCompatActivity {
     private Button cancelButton;
     private Button createButton;
     private TextView newCompMessage;
+    private View loadingScreen;
+    private TextView loadingScreenMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class NewComponentController extends AppCompatActivity {
         createButton = (Button) findViewById(R.id.createButton);
         newCompMessage = (TextView) findViewById(R.id.newCompMessage);
         newCompMessage.setText("");
+        loadingScreen = (View) findViewById(R.id.loadingScreen);
+        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
 
         cancelButton.setOnClickListener(v -> onBackPressed());
         createButton.setOnClickListener(this::createComponent);
@@ -80,6 +84,16 @@ public class NewComponentController extends AppCompatActivity {
         }
     }
 
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, ComponentsScreenController.class);
@@ -87,23 +101,23 @@ public class NewComponentController extends AppCompatActivity {
     }
 
     private void enableAll() {
+        loadingScreenOFF();
         compNameInput.setEnabled(true);
         compPinInput.setEnabled(true);
         compTypeInput.setEnabled(true);
         compDescriptionInput.setEnabled(true);
         cancelButton.setEnabled(true);
         createButton.setEnabled(true);
-        newCompMessage.setText("");
     }
 
     private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
         compNameInput.setEnabled(false);
         compPinInput.setEnabled(false);
         compTypeInput.setEnabled(false);
         compDescriptionInput.setEnabled(false);
         cancelButton.setEnabled(false);
         createButton.setEnabled(false);
-        newCompMessage.setText(R.string.waitingConnection);
     }
 
     @Override
@@ -171,7 +185,10 @@ public class NewComponentController extends AppCompatActivity {
     }
 
     private void createComponent(View v) {
+        disableAll();
+        loadingScreenON(getText(R.string.creatingComponent));
         if (!verifyData()) {
+            enableAll();
             return;
         }
         JSONObject extra = new JSONObject();
@@ -186,6 +203,7 @@ public class NewComponentController extends AppCompatActivity {
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
             e.printStackTrace();
+            enableAll();
             return;
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.ADD_COMPONENT, extra, resData -> {
@@ -193,11 +211,17 @@ public class NewComponentController extends AppCompatActivity {
                 Logger.log("data: " + resData.toString(), Level.DEBUG);
                 if (resData.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::creationSuccessful);
+                    handler.post(() -> {
+                        enableAll();
+                        creationSuccessful();
+                    });
                 }
                 else {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(this::creationUnsuccessful);
+                    handler.post(() -> {
+                        enableAll();
+                        creationUnsuccessful();
+                    });
                 }
             }
             catch (JSONException e) {

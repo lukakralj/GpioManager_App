@@ -31,6 +31,12 @@
         <item name="android:textColor">@color/colorMsg</item>
     </style>
 
+    <style name="LoadingMessage" parent="NormalText">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
     <!-- Other styles -->
     <style parent="Theme.AppCompat.Light.NoActionBar" name="AppTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
