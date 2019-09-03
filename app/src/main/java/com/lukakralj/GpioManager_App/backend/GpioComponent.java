@@ -2,9 +2,13 @@ package com.lukakralj.GpioManager_App.backend;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.Serializable;
 
+/**
+ * This class represents a component that is connected to a certain GPIO pin
+ * on the DragonBoard.
+ * It is serializable so that it can be passed in Intents between activities.
+ */
 public class GpioComponent implements Serializable {
 
     private int id;
@@ -15,6 +19,10 @@ public class GpioComponent implements Serializable {
     private boolean isOn;
     private int curValue;
 
+    /**
+     * Initialises the object with component information. To set the isOn and curValue use
+     * setters after the object is created.
+     */
     public GpioComponent(int id, int physicalPin, String direction, String name, String description) {
         this.id = id;
         this.physicalPin = physicalPin;
@@ -25,6 +33,11 @@ public class GpioComponent implements Serializable {
         this.curValue = -1;
     }
 
+    /**
+     * Initialises the object with component information that is parsed from a JSON object.
+     * This object also needs to contain values for isOn or curValue - depending on the
+     * type of the component.
+     */
     public GpioComponent(JSONObject data) throws JSONException {
         this.id = data.getInt("id");
         this.physicalPin = data.getInt("physicalPin");

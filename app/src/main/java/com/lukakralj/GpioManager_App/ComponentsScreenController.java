@@ -28,13 +28,17 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This activity displays the list of all the components that are currently registered.
+ */
 public class ComponentsScreenController extends ListActivity {
 
     private static List<GpioComponent> components = new ArrayList<>();
+    public static boolean joinedRoom;
+
     private ComponentsAdapter curAdapter;
     private boolean itemsEnabled;
     private TextView componentsMsg;
-    private boolean joinedRoom;
     private ImageButton newComponentBtn;
     private View loadingScreen;
     private TextView loadingScreenMsg;
@@ -44,15 +48,12 @@ public class ComponentsScreenController extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_components_screen);
 
-        // TODO: enable this (doesn't work because of ListActivity
-        /*Toolbar myToolbar = (Toolbar) findViewById(R.id.editComponentToolbar);
-        setSupportActionBar(myToolbar);*/
-
         loadingScreen = (View) findViewById(R.id.loadingScreen);
         loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
 
         itemsEnabled = true;
 
+        // Set custom adapter.
         curAdapter = new ComponentsAdapter(this, components);
         setListAdapter(curAdapter);
 
@@ -90,16 +91,6 @@ public class ComponentsScreenController extends ListActivity {
         }
     }
 
-    private void loadingScreenON(CharSequence msg) {
-        loadingScreen.setVisibility(View.VISIBLE);
-        loadingScreenMsg.setText(msg);
-    }
-
-    private void loadingScreenOFF() {
-        loadingScreen.setVisibility(View.GONE);
-        loadingScreenMsg.setText("");
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.base_menu, menu);
@@ -109,33 +100,49 @@ public class ComponentsScreenController extends ListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.configureURLlogin) {
-            // open url config activity
+            // Open URL configuration activity.
             showUrlDialog();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     void showUrlDialog() {
+        // Leave in case URL will be changed.
+        leaveComponentsRoom();
         Intent intent = new Intent(this, ConfigureURLController.class);
         startActivity(intent);
     }
 
     @Override
-    protected void onListItemClick(ListView list, View vi, int position, long id) {
-        super.onListItemClick(list, vi, position, id);
+    public void onBackPressed() {
+        leaveComponentsRoom();
+        Intent intent = new Intent(this, HomeScreenController.class);
+        startActivity(intent);
     }
 
-    private void disableAll() {
-        loadingScreenON(getText(R.string.waitingConnection));
-        newComponentBtn.setEnabled(false);
-        itemsEnabled = false;
-        curAdapter.notifyDataSetChanged();
+    /**
+     * Display the loading screen with the given message.
+     *
+     * @param msg Loading screen message.
+     */
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
     }
 
+    /**
+     * Hide the loading screen.
+     */
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
+    /**
+     * Enable all elements and hide the loading screen.
+     */
     private void enableAll() {
         loadingScreenOFF();
         newComponentBtn.setEnabled(true);
@@ -143,6 +150,42 @@ public class ComponentsScreenController extends ListActivity {
         curAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Disable all elements and display the loading screen.
+     */
+    private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
+        newComponentBtn.setEnabled(false);
+        itemsEnabled = false;
+        curAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onListItemClick(ListView list, View vi, int position, long id) {
+        super.onListItemClick(list, vi, position, id);
+    }
+
+    private void leaveComponentsRoom() {
+        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, data -> {
+            Logger.log("Left components room.");
+            joinedRoom = false;
+        });
+    }
+
+    /**
+     * Open edit component screen for the selected component.
+     *
+     * @param componentToEdit Component that the user wants to edit.
+     */
+    private void startEditComponentActivity(GpioComponent componentToEdit) {
+        Intent intent = new Intent(this, EditComponentController.class);
+        intent.putExtra("editComp", componentToEdit);
+        startActivity(intent);
+    }
+
+    /**
+     * Retrieves data of all the components from the server.
+     */
     private void retrieveData() {
         disableAll();
         loadingScreenON(getText(R.string.retrievingData));
@@ -173,7 +216,6 @@ public class ComponentsScreenController extends ListActivity {
                 }
                 catch (JSONException e) {
                     Logger.log(e.getLocalizedMessage(), Level.ERROR);
-                    e.printStackTrace();
                     msgId = R.string.sthWentWrong;
                 }
 
@@ -184,23 +226,9 @@ public class ComponentsScreenController extends ListActivity {
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        ServerConnection.getInstance().scheduleRequest(RequestCode.LEAVE_COMPONENTS_ROOM, data -> {
-            Logger.log("Left components room.");
-            joinedRoom = false;
-        });
-
-        Intent intent = new Intent(this, HomeScreenController.class);
-        startActivity(intent);
-    }
-
-    private void startEditComponentActivity(GpioComponent componentToEdit) {
-        Intent intent = new Intent(this, EditComponentController.class);
-        intent.putExtra("editComp", componentToEdit);
-        startActivity(intent);
-    }
-
+    /**
+     * Custom adapter for the ListView.
+     */
     private class ComponentsAdapter extends BaseAdapter {
         Context context;
         List<GpioComponent> data;
@@ -239,15 +267,7 @@ public class ComponentsScreenController extends ListActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View vi = convertView;
-            /*if (vi == null) {
-                if (data.get(position).getDirection().equals("out")) {
-                    vi = inflater.inflate(R.layout.out_component, null);
-                }
-                else {
-                    vi = inflater.inflate(R.layout.in_component, null);
-                }
-            }*/
+            View vi;
             if (data.get(position).getDirection().equals("out")) {
                 vi = inflater.inflate(R.layout.out_component, null);
             }
@@ -255,8 +275,8 @@ public class ComponentsScreenController extends ListActivity {
                 vi = inflater.inflate(R.layout.in_component, null);
             }
             ((TextView) vi.findViewById(R.id.mainTitle)).setText(data.get(position).getName());
+
             // roughly 28 characters plus 3 dots can fit on the screen nicely.
-            // TODO: check if you can enforce this in xml
             String description = data.get(position).getDescription();
             if (description.length() > 28) {
                 description = description.substring(0, 28) + "...";
@@ -268,7 +288,7 @@ public class ComponentsScreenController extends ListActivity {
                 RadioButton toggleOn = vi.findViewById(R.id.toggleOn);
                 RadioButton toggleOff = vi.findViewById(R.id.toggleOff);
 
-                // must set to null first otherwise an action is fired during setup
+                // Must set to null first otherwise an action is fired during setup.
                 toggle.setOnCheckedChangeListener(null);
                 if (data.get(position).getIsOn()) {
                     toggle.check(toggleOn.getId());
@@ -284,7 +304,7 @@ public class ComponentsScreenController extends ListActivity {
                         extra.put("status", (data.get(position).getIsOn()) ? "off" : "on");
                     }
                     catch (JSONException e) {
-                        Logger.log(e.getCause().toString(), Level.ERROR);
+                        Logger.log(e.getMessage(), Level.ERROR);
                         extra = null;
                     }
                     ServerConnection.getInstance().scheduleRequest(RequestCode.TOGGLE_COMPONENT, extra, (serverData) -> {
@@ -294,7 +314,7 @@ public class ComponentsScreenController extends ListActivity {
                             }
                         }
                         catch (JSONException e) {
-                            Logger.log(e.getCause().toString(), Level.ERROR);
+                            Logger.log(e.getMessage(), Level.ERROR);
                         }
                     });
                 });
@@ -312,12 +332,13 @@ public class ComponentsScreenController extends ListActivity {
                     statusIndicator.setEnabled(false);
                     statusIndicator.setText(R.string.OFF);
                 }
+                // If nothing is set the edit screen will pop up.
                 statusIndicator.setOnClickListener(v -> { /* Do nothing. */ });
             }
 
             vi.setOnClickListener(v -> startEditComponentActivity(data.get(position)));
 
-            // needed for correct rendering
+            // Needed for correct rendering.
             vi.setEnabled(itemsEnabled);
 
             return vi;

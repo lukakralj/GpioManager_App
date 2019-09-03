@@ -1,56 +1,63 @@
 <resources>
+    <!-- Titles -->
     <string name="app_name">GPIO Manager</string>
-    <string name="usernameHint">Username</string>
-    <string name="passwordHint">Password</string>
+    <string name="configure">Configure URL</string>
+    <string name="componentsTitle">Components</string>
+    <string name="newComponent">New component</string>
+    <string name="editComponent">Edit component</string>
+
+    <!-- Buttons -->
     <string name="loginButton">Login</string>
+    <string name="cancel">Cancel</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="logout">Logout</string>
+    <string name="ON">ON</string>
+    <string name="OFF">OFF</string>
+    <string name="componentsButton">Components</string>
+    <string name="add">Add</string>
+    <string name="save">Save</string>
+    <string name="deleteBtnDescription">Delete component button</string>
+    <string name="addCompBtnDescription">Add new component button</string>
+    <string name="editCompBtnDescription">Edit component button</string>
+
+    <!-- Error messages -->
     <string name="emptyUsernameMsg">Please enter a username first.</string>
     <string name="emptyPasswordMsg">Please enter a password first.</string>
     <string name="invalidCredentialsMsg">Invalid credentials.</string>
-    <string name="toggleLED">Toggle LED</string>
-    <string name="ledOn">LED was turned on.</string>
-    <string name="ledOff">LED was turned off.</string>
-    <string name="toggleLEDfailed">Could not toggle LED.</string>
-    <string name="configure">Configure URL</string>
-    <string name="newURLHint">Enter new URL</string>
-    <string name="cancel">Cancel</string>
-    <string name="reconnect">Reconnect</string>
-    <string name="ON">ON</string>
-    <string name="OFF">OFF</string>
-    <string name="waitingServer">Waiting for server&#8230;</string>
-    <string name="noComponents">No components are currently registered.</string>
-    <string name="componentsTitle">Components</string>
-    <string name="componentsButton">Components</string>
-    <string name="waitingConnection">Waiting for connection&#8230;</string>
-    <string name="retrievingData">Retrieving data&#8230;</string>
     <string name="sthWentWrong">Something went wrong :/</string>
+    <string name="emptyName">Please enter a name first.</string>
+    <string name="emptyPinNo">Please enter the pin number.</string>
+    <string name="invalidPinNo">Pin number must be between 24 and 34, inclusive.</string>
+    <string name="addingFailed">Component could not be added. Check if this pin is already in use.</string>
+    <string name="updateFailed">Component could not be updated. Check if this pin is already in use.</string>
+    <string name="deleteFailed">Component could not be deleted.</string>
+
+    <!-- Success messages -->
     <string name="upToDate">Up to date.</string>
-    <string name="addCompBtnDescription">Add new component button</string>
-    <string name="editCompBtnDescription">Edit component button</string>
-    <string name="logout">Logout</string>
-    <string name="newComponent">New component</string>
-    <string name="editComponent">Edit component</string>
-    <string name="create">Create</string>
-    <string name="save">Save</string>
+    <string name="addingOK">Component added successfully.</string>
+    <string name="updateOK">Component updated successfully.</string>
+    <string name="logoutOK">Logged out successfully.</string>
+    <string name="deleteOK">Component deleted successfully.</string>
+
+    <!-- Loading screen messages -->
+    <string name="waitingConnection">Waiting for connection&#8230;\n(check server URL)</string>
+    <string name="retrievingData">Retrieving data&#8230;</string>
+    <string name="settingUp">Setting up&#8230;</string>
+    <string name="verifyingUser">Verifying credentials&#8230;</string>
+    <string name="addingComponent">Adding component&#8230;</string>
+    <string name="deletingComponent">Deleting component&#8230;</string>
+    <string name="updatingComponent">Updating component&#8230;</string>
+
+    <!-- Other -->
+    <string name="usernameHint">Username</string>
+    <string name="passwordHint">Password</string>
+    <string name="newURLHint">Enter new URL</string>
+    <string name="noComponents">No components are currently registered.</string>
     <string name="name">Name</string>
     <string name="physicalPin">Physical pin</string>
     <string name="pinType">Pin type</string>
     <string name="inPin">IN pin</string>
     <string name="outPin">OUT pin</string>
     <string name="description">Description</string>
-    <string name="emptyName">Please enter name first.</string>
-    <string name="emptyPinNo">Please enter the pin number.</string>
-    <string name="invalidPinNo">Pin number must be between 24 and 34, inclusive.</string>
-    <string name="creationFailed">Component could not be created.</string>
-    <string name="creationOK">Component created successfully.</string>
-    <string name="updateFailed">Component could not be updated.</string>
-    <string name="updateOK">Component updated successfully.</string>
-    <string name="logoutOK">User logged out.</string>
-    <string name="delete">Delete</string>
-    <string name="deleteFailed">Component could not be deleted.</string>
-    <string name="deleteOK">Component deleted successfully.</string>
-    <string name="settingUp">Setting up</string>
-    <string name="verifyingUser">Verifying user</string>
-    <string name="creatingComponent">Creating component</string>
-    <string name="deletingComponent">Deleting component</string>
-    <string name="updatingComponent">Updating component</string>
+
 </resources>

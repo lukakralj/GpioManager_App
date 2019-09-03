@@ -15,16 +15,17 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.lukakralj.GpioManager_App.backend.GpioComponent;
 import com.lukakralj.GpioManager_App.backend.RequestCode;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 import com.lukakralj.GpioManager_App.backend.logger.Level;
 import com.lukakralj.GpioManager_App.backend.logger.Logger;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This activity enables the user to edit the selected component.
+ */
 public class EditComponentController extends AppCompatActivity {
 
     private EditText compNameInput;
@@ -111,14 +112,26 @@ public class EditComponentController extends AppCompatActivity {
         }
     }
 
-    private void loadingScreenON(CharSequence msg) {
-        loadingScreen.setVisibility(View.VISIBLE);
-        loadingScreenMsg.setText(msg);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.base_menu, menu);
+        return true;
     }
 
-    private void loadingScreenOFF() {
-        loadingScreen.setVisibility(View.GONE);
-        loadingScreenMsg.setText("");
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.configureURLlogin) {
+            // Open URL configuration activity.
+            showUrlDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    void showUrlDialog() {
+        Intent intent = new Intent(this, ConfigureURLController.class);
+        startActivity(intent);
     }
 
     @Override
@@ -127,6 +140,27 @@ public class EditComponentController extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Display the loading screen with the given message.
+     *
+     * @param msg Loading screen message.
+     */
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    /**
+     * Hide the loading screen.
+     */
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
+    /**
+     * Enable all elements and hide the loading screen.
+     */
     private void enableAll() {
         loadingScreenOFF();
         compNameInput.setEnabled(true);
@@ -138,6 +172,9 @@ public class EditComponentController extends AppCompatActivity {
         deleteButton.setEnabled(true);
     }
 
+    /**
+     * Disable all elements and display the loading screen.
+     */
     private void disableAll() {
         loadingScreenON(getText(R.string.waitingConnection));
         compNameInput.setEnabled(false);
@@ -147,57 +184,6 @@ public class EditComponentController extends AppCompatActivity {
         cancelButton.setEnabled(false);
         saveButton.setEnabled(false);
         deleteButton.setEnabled(false);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.base_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.configureURLlogin) {
-            // open url config activity
-            showUrlDialog();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    void showUrlDialog() {
-        Intent intent = new Intent(this, ConfigureURLController.class);
-        startActivity(intent);
-    }
-
-    private boolean verifyData() {
-        if (compNameInput.getText().toString().length() == 0) {
-            editComMessage.setText(R.string.emptyName);
-            return false;
-        }
-
-        if (compPinInput.getText().toString().length() == 0) {
-            editComMessage.setText(R.string.emptyPinNo);
-            return false;
-        }
-
-        int pinNo = 0;
-        try {
-            pinNo = Integer.parseInt(compPinInput.getText().toString());
-            // valid range 24-34 inclusive
-            if (pinNo < 24 || pinNo > 34) {
-                throw new NumberFormatException("Pin number out of range.");
-            }
-        }
-        catch (NumberFormatException e) {
-            editComMessage.setText(R.string.invalidPinNo);
-            return false;
-        }
-        editComMessage.setText("");
-        return true;
     }
 
     private void updateUnsuccessful() {
@@ -216,6 +202,11 @@ public class EditComponentController extends AppCompatActivity {
         notifySuccessful(R.string.deleteOK);
     }
 
+    /**
+     * Display a success message as a Toast.
+     *
+     * @param stringId message to display.
+     */
     private void notifySuccessful(int stringId) {
         int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(getApplicationContext(), stringId, duration);
@@ -225,6 +216,43 @@ public class EditComponentController extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Performs input checks and notifies user about the missing or invalid entries.
+     *
+     * @return True if all inputs are correct, false otherwise.
+     */
+    private boolean verifyData() {
+        if (compNameInput.getText().toString().length() == 0) {
+            editComMessage.setText(R.string.emptyName);
+            return false;
+        }
+
+        if (compPinInput.getText().toString().length() == 0) {
+            editComMessage.setText(R.string.emptyPinNo);
+            return false;
+        }
+
+        try {
+            int pinNo = Integer.parseInt(compPinInput.getText().toString());
+            // valid range: 24-34 inclusive
+            if (pinNo < 24 || pinNo > 34) {
+                throw new NumberFormatException("Pin number out of range.");
+            }
+        }
+        catch (NumberFormatException e) {
+            Logger.log(e.getMessage(), Level.WARNING);
+            editComMessage.setText(R.string.invalidPinNo);
+            return false;
+        }
+        editComMessage.setText("");
+        return true;
+    }
+
+    /**
+     * Sends the request to update the component.
+     *
+     * @param v
+     */
     private void updateComponent(View v) {
         disableAll();
         loadingScreenON(getText(R.string.updatingComponent));
@@ -244,13 +272,11 @@ public class EditComponentController extends AppCompatActivity {
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
-            e.printStackTrace();
             enableAll();
             return;
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.UPDATE_COMPONENT, extra, resData -> {
             try {
-                Logger.log("data: " + resData.toString(), Level.DEBUG);
                 if (resData.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(() -> {
@@ -268,11 +294,15 @@ public class EditComponentController extends AppCompatActivity {
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
-                e.printStackTrace();
             }
         });
     }
 
+    /**
+     * Sends the request to delete the component.
+     *
+     * @param v
+     */
     private void deleteComponent(View v) {
         disableAll();
         loadingScreenON(getText(R.string.deletingComponent));
@@ -282,12 +312,10 @@ public class EditComponentController extends AppCompatActivity {
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
-            e.printStackTrace();
             return;
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.REMOVE_COMPONENT, extra, data -> {
             try {
-                Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(() -> {
@@ -305,7 +333,6 @@ public class EditComponentController extends AppCompatActivity {
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
-                e.printStackTrace();
             }
         });
     }

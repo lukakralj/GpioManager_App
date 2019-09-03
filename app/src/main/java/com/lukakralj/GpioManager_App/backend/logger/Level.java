@@ -9,7 +9,7 @@ package com.lukakralj.GpioManager_App.backend.logger;
 public enum Level {
     /**The message marked with INFO represents general information about the state of the program at that point.*/
     INFO,
-    /**The message marked with WARNING requires more attention, but reports no errors in the workflow of the program.*/
+    /**The message marked with WARNING requires more attention, but reports no errors in the flow of the program.*/
     WARNING,
     /**The message marked with ERROR tells that something went wrong in the program (important exception caught etc.).
      * This messages are very important as they probably compromised the normal/expected workflow of the program*/

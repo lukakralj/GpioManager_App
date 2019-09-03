@@ -1,5 +1,8 @@
 package com.lukakralj.GpioManager_App.backend;
 
+/**
+ * All the possible request codes that the server can interpret.
+ */
 public enum RequestCode {
     LOGIN,
     LOGOUT,

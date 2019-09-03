@@ -1,7 +1,6 @@
 package com.lukakralj.GpioManager_App;
 
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,20 +13,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.lukakralj.GpioManager_App.backend.RequestCode;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 
 
 /**
- * This will be the main screen of the app once the user is logged in.
- * This should group different actions a user can take.
+ * This is the main screen of the app.
+ * It groups different actions the user can take.
  */
 public class HomeScreenController extends AppCompatActivity {
 
     private Button componentsButton;
     private Button logoutButton;
-    private TextView homeMessage;
     private View loadingScreen;
     private TextView loadingScreenMsg;
 
@@ -39,7 +36,6 @@ public class HomeScreenController extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.homeToolbar);
         setSupportActionBar(myToolbar);
 
-        homeMessage = (TextView) findViewById(R.id.homeMessage);
         componentsButton = (Button) findViewById(R.id.componentsButton);
         componentsButton.setOnClickListener((view) -> {
             Intent intent = new Intent(this, ComponentsScreenController.class);
@@ -71,28 +67,6 @@ public class HomeScreenController extends AppCompatActivity {
         }
     }
 
-    private void loadingScreenON(CharSequence msg) {
-        loadingScreen.setVisibility(View.VISIBLE);
-        loadingScreenMsg.setText(msg);
-    }
-
-    private void loadingScreenOFF() {
-        loadingScreen.setVisibility(View.GONE);
-        loadingScreenMsg.setText("");
-    }
-
-    private void enableAll() {
-        loadingScreenOFF();
-        logoutButton.setEnabled(true);
-        componentsButton.setEnabled(true);
-    }
-
-    private void disableAll() {
-        loadingScreenON(getText(R.string.waitingConnection));
-        logoutButton.setEnabled(false);
-        componentsButton.setEnabled(false);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.base_menu, menu);
@@ -102,13 +76,11 @@ public class HomeScreenController extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.configureURLlogin) {
-            // open url config activity
+            // Open URL configuration activity.
             showUrlDialog();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -116,7 +88,6 @@ public class HomeScreenController extends AppCompatActivity {
         Intent intent = new Intent(this, ConfigureURLController.class);
         startActivity(intent);
     }
-
 
     /**
      * Disable back button.
@@ -126,6 +97,45 @@ public class HomeScreenController extends AppCompatActivity {
         // do nothing...
     }
 
+    /**
+     * Display the loading screen with the given message.
+     *
+     * @param msg Loading screen message.
+     */
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    /**
+     * Hide the loading screen.
+     */
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
+    /**
+     * Enable all elements and hide the loading screen.
+     */
+    private void enableAll() {
+        loadingScreenOFF();
+        logoutButton.setEnabled(true);
+        componentsButton.setEnabled(true);
+    }
+
+    /**
+     * Disable all elements and display the loading screen.
+     */
+    private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
+        logoutButton.setEnabled(false);
+        componentsButton.setEnabled(false);
+    }
+
+    /**
+     * Clear tokens and send logout request.
+     */
     private void logoutUser() {
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
 
@@ -147,5 +157,4 @@ public class HomeScreenController extends AppCompatActivity {
         Intent intent = new Intent(this, LoginScreenController.class);
         startActivity(intent);
     }
-
 }

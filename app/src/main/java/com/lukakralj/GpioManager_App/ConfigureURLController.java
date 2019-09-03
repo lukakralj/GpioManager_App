@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 
+/**
+ * This activity enables modification of the server URL in case it changes.
+ */
 public class ConfigureURLController extends AppCompatActivity {
 
     private EditText newUrl;
@@ -30,6 +32,11 @@ public class ConfigureURLController extends AppCompatActivity {
 
     }
 
+    /**
+     * Saves the new URL and reconnects the ServerConnection.
+     *
+     * @param v
+     */
     private void handleReconnect(View v) {
         String url = newUrl.getText().toString();
         if (url.length() < 10) {

@@ -25,7 +25,6 @@ import org.json.JSONObject;
  * with predefined username and password.
  */
 public class LoginScreenController extends AppCompatActivity {
-
     private EditText usernameInput;
     private EditText passwordInput;
     private Button loginButton;
@@ -37,20 +36,19 @@ public class LoginScreenController extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: where to put this?
-        if (!Logger.isStarted()) {
-            Logger.startLogger();
-        }
-        ServerConnection.getInstance();
-
         setContentView(R.layout.activity_login_screen);
+        loadingScreen = (View) findViewById(R.id.loadingScreen);
+        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
+        loadingScreenON(getText(R.string.settingUp));
+
+        // Initialise logger and server connection.
+        Logger.startLogger();
+        ServerConnection.getInstance();
 
         usernameInput = (EditText) findViewById(R.id.usernameInput);
         passwordInput = (EditText) findViewById(R.id.passwordInput);
         loginMessage = (TextView) findViewById(R.id.loginMessage);
-        loadingScreen = (View) findViewById(R.id.loadingScreen);
-        loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
-        loadingScreenON(getText(R.string.settingUp));
+
         resetAll();
 
         loginButton = (Button) findViewById(R.id.loginButton);
@@ -77,6 +75,7 @@ public class LoginScreenController extends AppCompatActivity {
             disableAll();
         }
 
+        // Retrieve the last saved server URL.
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         String url = prefs.getString("url", null);
         if (url != null && !ServerConnection.getInstance().isConnected()) {
@@ -86,6 +85,104 @@ public class LoginScreenController extends AppCompatActivity {
         checkTokenAndRedirect();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.base_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.configureURLlogin) {
+            // Open URL configuration activity.
+            showUrlDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    void showUrlDialog() {
+        Intent intent = new Intent(this, ConfigureURLController.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Disable back button.
+     */
+    @Override
+    public void onBackPressed() {
+        // do nothing...
+    }
+
+    /**
+     * Display the loading screen with the given message.
+     *
+     * @param msg Loading screen message.
+     */
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    /**
+     * Hide the loading screen.
+     */
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
+    /**
+     * Clears all input boxes and messages.
+     */
+    private void resetAll() {
+        usernameInput.setText("");
+        passwordInput.setText("");
+        loginMessage.setText("");
+    }
+
+    /**
+     * Enable all elements and hide the loading screen.
+     */
+    private void enableAll() {
+        loadingScreenOFF();
+        usernameInput.setEnabled(true);
+        passwordInput.setEnabled(true);
+        loginButton.setEnabled(true);
+    }
+
+    /**
+     * Disable all elements and display the loading screen.
+     */
+    private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
+        usernameInput.setEnabled(false);
+        passwordInput.setEnabled(false);
+        loginButton.setEnabled(false);
+    }
+
+    /**
+     * Invalid login, notify user.
+     */
+    private void invalidCredentials() {
+        resetAll();
+        loginMessage.setText(getString(R.string.invalidCredentialsMsg));
+    }
+
+    /**
+     * This method opens a new activity upon successful login.
+     */
+    private void startHomeActivity() {
+        resetAll();
+        Intent intent = new Intent(this, HomeScreenController.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Verifies if the last saved token is still valid. If it is the user is redirected
+     * to home screen. If not they need to login again.
+     */
     private void checkTokenAndRedirect() {
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         String token = prefs.getString("accessToken", null);
@@ -109,47 +206,13 @@ public class LoginScreenController extends AppCompatActivity {
                 }
                 catch (JSONException e) {
                     Logger.log(e.getMessage(), Level.ERROR);
-                    e.printStackTrace();
                 }
             });
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.base_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.configureURLlogin) {
-            // open url config activity
-            showUrlDialog();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    void showUrlDialog() {
-        Intent intent = new Intent(this, ConfigureURLController.class);
-        startActivity(intent);
-    }
-
-
     /**
-     * Disable back button.
-     */
-    @Override
-    public void onBackPressed() {
-        // do nothing...
-    }
-
-    /**
-     * Decide what happens when a Login button is clicked.
+     * Decide what happens when the Login button is clicked.
      *
      * @param v
      */
@@ -169,15 +232,7 @@ public class LoginScreenController extends AppCompatActivity {
     }
 
     /**
-     * Defines what happens when credentials are invalid.
-     */
-    private void invalidCredentials() {
-        resetAll();
-        loginMessage.setText(getString(R.string.invalidCredentialsMsg));
-    }
-
-    /**
-     * This method verifies user. It send a login request.
+     * Send a login request to verify user and obtain the access token.
      *
      * @param username Username the user entered.
      * @param password Password the user entered.
@@ -190,18 +245,19 @@ public class LoginScreenController extends AppCompatActivity {
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
-e.printStackTrace();
             invalidCredentials();
             return;
         }
         ServerConnection.getInstance().scheduleRequest(RequestCode.LOGIN, extraData, data -> {
             try {
-                Logger.log("data: " + data.toString(), Level.DEBUG);
                 if (data.getString("status").equals("OK")) {
+                    // Save token.
                     SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString("accessToken", data.getString("accessToken"));
                     editor.apply();
+                    // Cache token in ServerConnection class.
+                    ServerConnection.getInstance().setAccessToken(data.getString("accessToken"));
                     startHomeActivity();
                 }
                 else {
@@ -211,50 +267,7 @@ e.printStackTrace();
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
-e.printStackTrace();
             }
         });
-    }
-
-    private void loadingScreenON(CharSequence msg) {
-        loadingScreen.setVisibility(View.VISIBLE);
-        loadingScreenMsg.setText(msg);
-    }
-
-    private void loadingScreenOFF() {
-        loadingScreen.setVisibility(View.GONE);
-        loadingScreenMsg.setText("");
-    }
-
-    /**
-     * Clears all input boxes and messages.
-     */
-    private void resetAll() {
-        usernameInput.setText("");
-        passwordInput.setText("");
-        loginMessage.setText("");
-    }
-
-    private void enableAll() {
-        loadingScreenOFF();
-        usernameInput.setEnabled(true);
-        passwordInput.setEnabled(true);
-        loginButton.setEnabled(true);
-    }
-
-    private void disableAll() {
-        loadingScreenON(getText(R.string.waitingConnection));
-        usernameInput.setEnabled(false);
-        passwordInput.setEnabled(false);
-        loginButton.setEnabled(false);
-    }
-
-    /**
-     * This method opens a new activity upon successful login.
-     */
-    private void startHomeActivity() {
-        resetAll();
-        Intent intent = new Intent(this, HomeScreenController.class);
-        startActivity(intent);
     }
 }

@@ -23,7 +23,6 @@ public class Logger {
      *
      * @param consoleOutputIn True if we want to output to the console, false if not.
      * @param autoFlushIn True if you want all the logs to be immediately outputed, false if not.
-     *                    N.B. that outputting to the file on each log might impact overall performance a bit.
      */
     public static void startLogger(boolean consoleOutputIn, boolean autoFlushIn) {
         if (started) {
@@ -77,7 +76,6 @@ public class Logger {
     }
 
     /**
-     * @see #log(String, Level)
      * Level of this message is INFO.
      *
      * @param message Message that we want to log.
@@ -99,9 +97,5 @@ public class Logger {
             System.out.println(buffer);
         }
         buffer = new StringBuffer();
-    }
-
-    public static boolean isStarted() {
-        return started;
     }
 }

@@ -21,6 +21,9 @@ import com.lukakralj.GpioManager_App.backend.logger.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This activity enables the user to add a new component.
+ */
 public class NewComponentController extends AppCompatActivity {
 
     private EditText compNameInput;
@@ -28,7 +31,7 @@ public class NewComponentController extends AppCompatActivity {
     private Switch compTypeInput;
     private EditText compDescriptionInput;
     private Button cancelButton;
-    private Button createButton;
+    private Button addButton;
     private TextView newCompMessage;
     private View loadingScreen;
     private TextView loadingScreenMsg;
@@ -46,14 +49,14 @@ public class NewComponentController extends AppCompatActivity {
         compTypeInput = (Switch) findViewById(R.id.compTypeInput);
         compDescriptionInput = (EditText) findViewById(R.id.compDescriptionInput);
         cancelButton = (Button) findViewById(R.id.cancelButton);
-        createButton = (Button) findViewById(R.id.createButton);
+        addButton = (Button) findViewById(R.id.addButton);
         newCompMessage = (TextView) findViewById(R.id.newCompMessage);
         newCompMessage.setText("");
         loadingScreen = (View) findViewById(R.id.loadingScreen);
         loadingScreenMsg = (TextView) findViewById(R.id.loadingScreenMsg);
 
         cancelButton.setOnClickListener(v -> onBackPressed());
-        createButton.setOnClickListener(this::createComponent);
+        addButton.setOnClickListener(this::addComponent);
 
         compTypeInput.setChecked(false);
         compTypeInput.setText(R.string.outPin);
@@ -84,42 +87,6 @@ public class NewComponentController extends AppCompatActivity {
         }
     }
 
-    private void loadingScreenON(CharSequence msg) {
-        loadingScreen.setVisibility(View.VISIBLE);
-        loadingScreenMsg.setText(msg);
-    }
-
-    private void loadingScreenOFF() {
-        loadingScreen.setVisibility(View.GONE);
-        loadingScreenMsg.setText("");
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(this, ComponentsScreenController.class);
-        startActivity(intent);
-    }
-
-    private void enableAll() {
-        loadingScreenOFF();
-        compNameInput.setEnabled(true);
-        compPinInput.setEnabled(true);
-        compTypeInput.setEnabled(true);
-        compDescriptionInput.setEnabled(true);
-        cancelButton.setEnabled(true);
-        createButton.setEnabled(true);
-    }
-
-    private void disableAll() {
-        loadingScreenON(getText(R.string.waitingConnection));
-        compNameInput.setEnabled(false);
-        compPinInput.setEnabled(false);
-        compTypeInput.setEnabled(false);
-        compDescriptionInput.setEnabled(false);
-        cancelButton.setEnabled(false);
-        createButton.setEnabled(false);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.base_menu, menu);
@@ -129,13 +96,11 @@ public class NewComponentController extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.configureURLlogin) {
-            // open url config activity
+            // Open URL configuration activity.
             showUrlDialog();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -144,6 +109,77 @@ public class NewComponentController extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, ComponentsScreenController.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Display the loading screen with the given message.
+     *
+     * @param msg Loading screen message.
+     */
+    private void loadingScreenON(CharSequence msg) {
+        loadingScreen.setVisibility(View.VISIBLE);
+        loadingScreenMsg.setText(msg);
+    }
+
+    /**
+     * Hide the loading screen.
+     */
+    private void loadingScreenOFF() {
+        loadingScreen.setVisibility(View.GONE);
+        loadingScreenMsg.setText("");
+    }
+
+    /**
+     * Enable all elements and hide the loading screen.
+     */
+    private void enableAll() {
+        loadingScreenOFF();
+        compNameInput.setEnabled(true);
+        compPinInput.setEnabled(true);
+        compTypeInput.setEnabled(true);
+        compDescriptionInput.setEnabled(true);
+        cancelButton.setEnabled(true);
+        addButton.setEnabled(true);
+    }
+
+    /**
+     * Disable all elements and display the loading screen.
+     */
+    private void disableAll() {
+        loadingScreenON(getText(R.string.waitingConnection));
+        compNameInput.setEnabled(false);
+        compPinInput.setEnabled(false);
+        compTypeInput.setEnabled(false);
+        compDescriptionInput.setEnabled(false);
+        cancelButton.setEnabled(false);
+        addButton.setEnabled(false);
+    }
+
+    private void creationUnsuccessful() {
+        newCompMessage.setText(R.string.addingFailed);
+    }
+
+    /**
+     * Display a success message as a Toast.
+     */
+    private void creationSuccessful() {
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(getApplicationContext(), R.string.addingOK, duration);
+        toast.show();
+
+        Intent intent = new Intent(this, ComponentsScreenController.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Performs input checks and notifies user about the missing or invalid entries.
+     *
+     * @return True if all inputs are correct, false otherwise.
+     */
     private boolean verifyData() {
         if (compNameInput.getText().toString().length() == 0) {
             newCompMessage.setText(R.string.emptyName);
@@ -155,15 +191,15 @@ public class NewComponentController extends AppCompatActivity {
             return false;
         }
 
-        int pinNo = 0;
         try {
-            pinNo = Integer.parseInt(compPinInput.getText().toString());
-            // valid range 24-34 inclusive
+            int pinNo = Integer.parseInt(compPinInput.getText().toString());
+            // valid range: 24-34 inclusive
             if (pinNo < 24 || pinNo > 34) {
                 throw new NumberFormatException("Pin number out of range.");
             }
         }
         catch (NumberFormatException e) {
+            Logger.log(e.getMessage(), Level.WARNING);
             newCompMessage.setText(R.string.invalidPinNo);
             return false;
         }
@@ -171,22 +207,14 @@ public class NewComponentController extends AppCompatActivity {
         return true;
     }
 
-    private void creationUnsuccessful() {
-        newCompMessage.setText(R.string.creationFailed);
-    }
-
-    private void creationSuccessful() {
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(getApplicationContext(), R.string.creationOK, duration);
-        toast.show();
-
-        Intent intent = new Intent(this, ComponentsScreenController.class);
-        startActivity(intent);
-    }
-
-    private void createComponent(View v) {
+    /**
+     * Sends the request to add a new component.
+     *
+     * @param v
+     */
+    private void addComponent(View v) {
         disableAll();
-        loadingScreenON(getText(R.string.creatingComponent));
+        loadingScreenON(getText(R.string.addingComponent));
         if (!verifyData()) {
             enableAll();
             return;
@@ -202,7 +230,6 @@ public class NewComponentController extends AppCompatActivity {
         }
         catch (JSONException e) {
             Logger.log(e.getMessage(), Level.ERROR);
-            e.printStackTrace();
             enableAll();
             return;
         }
@@ -226,7 +253,6 @@ public class NewComponentController extends AppCompatActivity {
             }
             catch (JSONException e) {
                 Logger.log(e.getMessage(), Level.ERROR);
-                e.printStackTrace();
             }
         });
     }
