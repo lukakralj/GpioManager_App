@@ -2,7 +2,7 @@
 A mobile app that is used to remotely manage GPIO pins on the DragonBoard 410c - from everywhere!
 
 # Aim
-The purpose of this project was to set up a basis for a remote control of various components that are connected to GPIO pins on the DragonBoard (DB). The app enables to turn those components on and off with a single tap, or it can display if a sensor-like component is triggered or not.
+The purpose of this project was to set up a basis for a remote control of various components that are connected to GPIO pins on the DragonBoard (DB). The app enables to turn those components on and off with a single tap, or it can display if a sensor-like component is triggered or not. This app (together with the server) can be a good starting point to create an IoT hub that can allow the control of many devices from your phone.
 
 ![Components screen shows all components that are currently registered.](./screenshots/small/components_screen.png?raw=true "Components screen shows all components that are currently registered.")
 
