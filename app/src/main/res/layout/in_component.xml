@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="5dp"
-                android:text="@string/toggleLED"
+                android:text=""
                 android:textAlignment="viewStart"
                 android:textSize="15sp" />
 
@@ -48,7 +48,7 @@
                 style="@style/SubtitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/toggleLED"
+                android:text=""
                 android:textAlignment="viewStart"
                 android:textSize="12sp" />
         </LinearLayout>

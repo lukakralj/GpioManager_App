@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
+
 import com.lukakralj.GpioManager_App.backend.RequestCode;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
 import com.lukakralj.GpioManager_App.backend.logger.Level;
@@ -32,6 +34,8 @@ public class LoginScreenController extends AppCompatActivity {
     private View loadingScreen;
     private TextView loadingScreenMsg;
 
+    private static LoginScreenController lastInstance;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +48,7 @@ public class LoginScreenController extends AppCompatActivity {
         // Initialise logger and server connection.
         Logger.startLogger();
         ServerConnection.getInstance();
+        lastInstance = this;
 
         usernameInput = (EditText) findViewById(R.id.usernameInput);
         passwordInput = (EditText) findViewById(R.id.passwordInput);
@@ -180,6 +185,26 @@ public class LoginScreenController extends AppCompatActivity {
     }
 
     /**
+     * Starts the login activity.
+     */
+    public static void startLoginActivity() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            Intent intent = new Intent(lastInstance, LoginScreenController.class);
+            lastInstance.startActivity(intent);
+        });
+    }
+
+    /**
+     * Display the "session expired" Toast message.
+     */
+    private void showSessionExpired() {
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(lastInstance.getApplicationContext(), R.string.sessionExpired, duration);
+        toast.show();
+    }
+
+    /**
      * Verifies if the last saved token is still valid. If it is the user is redirected
      * to home screen. If not they need to login again.
      */
@@ -202,6 +227,11 @@ public class LoginScreenController extends AppCompatActivity {
                     }
                     else {
                         ServerConnection.getInstance().setAccessToken(null);
+                        Handler handler1 = new Handler(Looper.getMainLooper());
+                        handler1.post(() -> {
+                            showSessionExpired();
+                            enableAll();
+                        });
                     }
                 }
                 catch (JSONException e) {
@@ -258,7 +288,8 @@ public class LoginScreenController extends AppCompatActivity {
                     editor.apply();
                     // Cache token in ServerConnection class.
                     ServerConnection.getInstance().setAccessToken(data.getString("accessToken"));
-                    startHomeActivity();
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(this::startHomeActivity);
                 }
                 else {
                     Handler handler = new Handler(Looper.getMainLooper());

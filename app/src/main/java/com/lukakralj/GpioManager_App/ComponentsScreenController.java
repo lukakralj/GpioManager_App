@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -60,6 +58,7 @@ public class ComponentsScreenController extends ListActivity {
         componentsMsg = (TextView) findViewById(R.id.componentsMsg);
         newComponentBtn = (ImageButton) findViewById(R.id.newComponentBtn);
         newComponentBtn.setOnClickListener((view) -> {
+            leaveComponentsRoom();
             Intent intent = new Intent(this, NewComponentController.class);
             startActivity(intent);
         });
@@ -89,30 +88,6 @@ public class ComponentsScreenController extends ListActivity {
         else {
             disableAll();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.base_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.configureURLlogin) {
-            // Open URL configuration activity.
-            showUrlDialog();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    void showUrlDialog() {
-        // Leave in case URL will be changed.
-        leaveComponentsRoom();
-        Intent intent = new Intent(this, ConfigureURLController.class);
-        startActivity(intent);
     }
 
     @Override
@@ -178,6 +153,7 @@ public class ComponentsScreenController extends ListActivity {
      * @param componentToEdit Component that the user wants to edit.
      */
     private void startEditComponentActivity(GpioComponent componentToEdit) {
+        leaveComponentsRoom();
         Intent intent = new Intent(this, EditComponentController.class);
         intent.putExtra("editComp", componentToEdit);
         startActivity(intent);
@@ -205,7 +181,6 @@ public class ComponentsScreenController extends ListActivity {
                         JSONArray comps = data.getJSONArray("components");
                         components.clear();
                         for (int i = 0; i < comps.length(); ++i) {
-                            Logger.log(comps.getJSONObject(i).toString(), Level.DEBUG);
                             components.add(new GpioComponent(comps.getJSONObject(i)));
                         }
                         msgId = R.string.upToDate;

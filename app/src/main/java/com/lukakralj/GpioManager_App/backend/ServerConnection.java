@@ -1,5 +1,6 @@
 package com.lukakralj.GpioManager_App.backend;
 
+import com.lukakralj.GpioManager_App.LoginScreenController;
 import com.lukakralj.GpioManager_App.backend.logger.Level;
 import com.lukakralj.GpioManager_App.backend.logger.Logger;
 import java.net.URISyntaxException;
@@ -87,16 +88,18 @@ public class ServerConnection extends Thread {
      */
     public static void reconnect(String newUrl) {
         Logger.log("Reconnecting with: " + newUrl);
-        instance.stopThread();
-        try {
-            instance.join();
+        if (instance != null) {
+            instance.stopThread();
+            try {
+                instance.join();
+            }
+            catch (InterruptedException e) {
+                Logger.log(e.getMessage(), Level.ERROR);
+            }
+            instance.io.disconnect();
+            instance.io.close();
+            instance = null;
         }
-        catch (InterruptedException e) {
-            Logger.log(e.getMessage(), Level.ERROR);
-        }
-        instance.io.disconnect();
-        instance.io.close();
-        instance = null;
         url = newUrl;
         getInstance();
     }
@@ -149,7 +152,21 @@ public class ServerConnection extends Thread {
         io.once(code + "Res", args -> {
             try {
                 JSONObject data = (JSONObject)args[0];
-                event.listener.processResponse(data);
+                if (event.requestCode != LOGIN && event.requestCode != LOGOUT && event.requestCode != REFRESH_TOKEN) {
+                    // Need to verify if the authentication was still okay.
+                    if (data.getString("status").equals("ERR")
+                        && (data.getString("err_code").equals("BAD_AUTH")
+                        || data.getString("err_code").equals("NO_AUTH"))) {
+                        // Redirect back to login screen.
+                        LoginScreenController.startLoginActivity();
+                    }
+                    else {
+                        event.listener.processResponse(data);
+                    }
+                }
+                else {
+                    event.listener.processResponse(data);
+                }
             }
             catch (Exception e) {
                 Logger.log(e.getMessage(), Level.ERROR);

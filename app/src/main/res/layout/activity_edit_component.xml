@@ -52,8 +52,8 @@
     <EditText
         android:id="@+id/compPinInput"
         style="@style/NormalText"
-        android:layout_width="96dp"
-        android:layout_height="49dp"
+        android:layout_width="65dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:autofillHints=""
@@ -74,22 +74,22 @@
         android:layout_marginEnd="8dp"
         android:text="@string/physicalPin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.163"
+        app:layout_constraintHorizontal_bias="0.157"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/compNameInput" />
 
     <Switch
         android:id="@+id/compTypeInput"
         style="@style/NormalText"
-        android:layout_width="133dp"
-        android:layout_height="46dp"
+        android:layout_width="154dp"
+        android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/outPin"
         android:textOff="@string/outPin"
         android:textOn="@string/inPin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
+        app:layout_constraintHorizontal_bias="0.551"
         app:layout_constraintStart_toEndOf="@+id/compPinInput"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
@@ -110,7 +110,7 @@
         android:id="@+id/compDescriptionInput"
         style="@style/NormalText"
         android:layout_width="290dp"
-        android:layout_height="189dp"
+        android:layout_height="140dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:autofillHints=""

@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import com.lukakralj.GpioManager_App.backend.ServerConnection;
+import com.lukakralj.GpioManager_App.backend.logger.Level;
+import com.lukakralj.GpioManager_App.backend.logger.Logger;
 
 /**
  * This activity enables modification of the server URL in case it changes.
@@ -22,14 +24,18 @@ public class ConfigureURLController extends AppCompatActivity {
         setContentView(R.layout.activity_configure_url);
 
         newUrl = (EditText) findViewById(R.id.newUrlInput);
-        newUrl.setText(ServerConnection.getInstance().getCurrentUrl());
+        try {
+            newUrl.setText(ServerConnection.getInstance().getCurrentUrl());
+        }
+        catch (RuntimeException e) {
+            Logger.log(e.getMessage(), Level.WARNING);
+            newUrl.setText("");
+        }
 
         final Button cancelButton = (Button) findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(v -> onBackPressed());
-
         final Button reconnectButton = (Button) findViewById(R.id.reconnectButton);
         reconnectButton.setOnClickListener(this::handleReconnect);
-
     }
 
     /**
@@ -44,12 +50,21 @@ public class ConfigureURLController extends AppCompatActivity {
             return;
         }
 
+        try {
+            ServerConnection.reconnect(url);
+        }
+        catch (RuntimeException e) {
+            // URL was probably malformed.
+            Logger.log(e.getMessage(), Level.WARNING);
+            newUrl.setBackgroundColor(Color.RED);
+            return;
+        }
+
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("url", url);
         editor.apply();
 
-        ServerConnection.reconnect(url);
         onBackPressed();
     }
 }

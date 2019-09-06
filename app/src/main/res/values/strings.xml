@@ -31,6 +31,7 @@
     <string name="addingFailed">Component could not be added. Check if this pin is already in use.</string>
     <string name="updateFailed">Component could not be updated. Check if this pin is already in use.</string>
     <string name="deleteFailed">Component could not be deleted.</string>
+    <string name="sessionExpired">Session has expired.</string>
 
     <!-- Success messages -->
     <string name="upToDate">Up to date.</string>
