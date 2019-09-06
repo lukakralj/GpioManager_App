@@ -9,6 +9,8 @@ The app connects to the server that is running on the DB (see [server repository
 
 User needs to log in in order to use the app, which prevents anyone else from messing with your DB's GPIOs. After that you can see the connected components, edit them, and also register new ones.
 
+You can login from different devices as many times as you want. The information about components will be updated in real time on all of the devices for all the users logged in as soon as the changes occur.
+
 # Requirements
 The target API is 26, however, for the purposes of testing I tried using a phone with an API version 24 and everything worked fine.
 Should you wish to change the minimum Sdk version, change it in App's build.gradle file and re-sync the project.
@@ -20,11 +22,18 @@ The app is most easily installed through Android Studio.
 3. Turn on Developer options on your phone (see instructions [here](https://developer.android.com/studio/debug/dev-options)).
 4. In Developer options tab in phone settings, enable USB-debugging and Allow installation via USB cable.
 5. Connect your phone with a USB cable. 
-6. On your phone tap the notification that pops up - USB Preferences - and enable File transfer.
+6. On your phone, tap the notification that pops up. USB Preferences screen should open; on this screen enable File transfer option (instead of just charging your device).
 7. Click the Run button (or Shift+F10) in Android Studio.
-8. Select your phone and click OK.
+8. Select your phone from the list and click OK.
 9. On your phone, allow installation if prompted.
 10. After the installation the app will automatically open.
 
 # Disclaimer
 The UI was only tested on Xiaomi A2 Lite, so on your phone some buttons and other elements might shift off the screen. To fix this you will only need to manipulate the XML files in the `res/layout` folder.
+
+The app normally works fine. Some minor glitches can occur if the app is inactive for a longer time and then accessed from the Recent apps. These sorts of glitches disappear if the app is restarted.
+
+## Feedback
+Whether you liked the project or not, I will be very thankful for any feedback, suggestions or comments on the project.
+
+*Feel free to [email](mailto:luka.kralj2@gmail.com) me!*
