@@ -4,18 +4,18 @@ A mobile app that is used to remotely manage GPIO pins on the DragonBoard 410c -
 # Aim
 The purpose of this project was to set up a basis for a remote control of various components that are connected to GPIO pins on the DragonBoard (DB). The app enables to turn those components on and off with a single tap, or it can display if a sensor-like component is triggered or not.
 
-![Components screen shows all components that are currently registered.](./screenshots/components_screen.png?raw=true "Components screen shows all components that are currently registered.")
+![Components screen shows all components that are currently registered.](./screenshots/small/components_screen.png?raw=true "Components screen shows all components that are currently registered.")
 
 # How it works
 The app connects to the server that is running on the DB (see [server repository](https://github.com/lukakralj/GpioManager_Server)) through an ngrok tunnel. For this you simply need to enter the correct URL address in the URL configuration screen.
 
-![Server URL can be configured at runtime if it changes.](./screenshots/configure_url.png?raw=true "Server URL can be configured at runtime if it changes.")
+![Server URL can be configured at runtime if it changes.](./screenshots/small/configure_url.png?raw=true "Server URL can be configured at runtime if it changes.")
 
 User needs to log in in order to use the app, which prevents anyone else from messing with your DB's GPIOs. After that you can see the connected components, edit them, and also register new ones.
 
 You can login from different devices as many times as you want. The information about components will be updated in real time on all of the devices for all the users logged in as soon as the changes occur.
 
-![The components information is updated in real time.](./screenshots/retrieving_data.png?raw=true "The components information is updated in real time.")
+![The components information is updated in real time.](./screenshots/small/retrieving_data.png?raw=true "The components information is updated in real time.")
 
 # Requirements
 The target API is 26, however, for the purposes of testing I tried using a phone with an API version 24 and everything worked fine.
