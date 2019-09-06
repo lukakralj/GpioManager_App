@@ -28,6 +28,9 @@ import java.util.List;
 
 /**
  * This activity displays the list of all the components that are currently registered.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class ComponentsScreenController extends ListActivity {
 

@@ -17,6 +17,9 @@ import org.json.JSONObject;
 /**
  * This class enables communication with the main server. All the communication
  * happens on the background thread that is different from the UI thread.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class ServerConnection extends Thread {
     private static String url = ""; // Server URL.

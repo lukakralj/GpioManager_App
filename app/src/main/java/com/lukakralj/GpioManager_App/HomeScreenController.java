@@ -20,6 +20,9 @@ import com.lukakralj.GpioManager_App.backend.ServerConnection;
 /**
  * This is the main screen of the app.
  * It groups different actions the user can take.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class HomeScreenController extends AppCompatActivity {
 

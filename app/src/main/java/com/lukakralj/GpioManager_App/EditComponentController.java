@@ -25,6 +25,9 @@ import org.json.JSONObject;
 
 /**
  * This activity enables the user to edit the selected component.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class EditComponentController extends AppCompatActivity {
 

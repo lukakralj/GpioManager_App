@@ -8,6 +8,9 @@ import java.io.Serializable;
  * This class represents a component that is connected to a certain GPIO pin
  * on the DragonBoard.
  * It is serializable so that it can be passed in Intents between activities.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class GpioComponent implements Serializable {
 

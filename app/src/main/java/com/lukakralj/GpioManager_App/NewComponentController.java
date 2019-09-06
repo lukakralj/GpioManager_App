@@ -23,6 +23,9 @@ import org.json.JSONObject;
 
 /**
  * This activity enables the user to add a new component.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class NewComponentController extends AppCompatActivity {
 

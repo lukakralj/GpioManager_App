@@ -25,6 +25,9 @@ import org.json.JSONObject;
 /**
  * This is the entry point of the application. It requires the user to login
  * with predefined username and password.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class LoginScreenController extends AppCompatActivity {
     private EditText usernameInput;

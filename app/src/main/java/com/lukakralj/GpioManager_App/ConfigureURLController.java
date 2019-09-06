@@ -13,6 +13,9 @@ import com.lukakralj.GpioManager_App.backend.logger.Logger;
 
 /**
  * This activity enables modification of the server URL in case it changes.
+ *
+ *  @author Luka Kralj
+ *  @version 1.0
  */
 public class ConfigureURLController extends AppCompatActivity {
 
