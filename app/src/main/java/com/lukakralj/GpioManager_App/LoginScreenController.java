@@ -231,6 +231,10 @@ public class LoginScreenController extends AppCompatActivity {
                         handler1.post(() -> {
                             showSessionExpired();
                             enableAll();
+                            // Remove token from prefs.
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.remove("accessToken");
+                            editor.apply();
                         });
                     }
                 }
