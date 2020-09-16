@@ -1,5 +1,7 @@
 # GpioManager_App
-A mobile app that is used to remotely manage GPIO pins on the DragonBoard 410c - from everywhere!
+A mobile app that is used to remotely manage GPIO pins on the DragonBoard 410c - from everywhere! 
+
+You can read more about this project in [this blog post](https://lukakralj.com/gpio-manager/).
 
 ## Aim
 The purpose of this project was to set up a basis for a remote control of various components that are connected to GPIO pins on the DragonBoard (DB). The app enables to turn those components on and off with a single tap, or it can display if a sensor-like component is triggered or not. This app (together with the [server](https://github.com/lukakralj/GpioManager_Server)) can be a good starting point to create an IoT hub that can allow the control of many devices from your phone.
@@ -42,4 +44,4 @@ The app normally works fine. Some minor glitches can occur if the app is inactiv
 ### Feedback
 Whether you liked the project or not, I would be very thankful for any feedback, suggestions or comments on the project.
 
-*Feel free to [email](mailto:luka.kralj2@gmail.com) me!*
+*Feel free to [email](mailto:luka.kralj.cs@gmail.com) me!*
